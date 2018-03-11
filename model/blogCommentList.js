@@ -7,13 +7,13 @@ autoIncrement.initialize(connection);
 
 var blogCommentListSchema = new Schema({ 
     "blogId":Number,
-    "commentUserInfo":{type: Number, ref: 'User'},
+    "userInfo":{type: Number, ref: 'User'},
     "repliedUserInfo":{type: Number, ref: 'User'},
     "createTime":Number,
-    "blogCommentPraiseCount":Number,
-    "blogCommentContent":String,
-    "commentStatus":Number,//如果是1，则是评论，如果是2，则是评论的回复
-    "blogCommentReplyList":[{
+    "likeNum":{type:Number,default:0},
+    "content":String,
+    "status":Number,//如果是1，则是评论，如果是2，则是评论的回复
+    "replyList":[{
         type: Number,
         ref: 'BlogCommentReplyList',
     }],
@@ -24,10 +24,10 @@ blogCommentListSchema.statics = {
     findUserByCommentId: function(blogId,callback){
         return this
             .find({blogId:blogId})
-            .populate({path:'commentUserInfo',select:'userName userImg _id'})
-            .populate({path:'repliedUserInfo',select:'userName userImg _id'})
-            .populate({path:'blogCommentReplyList', populate:{path:'replyUserInfo',select:'userName userImg _id'}})
-            .populate({path:'blogCommentReplyList', populate:{path:'commentRepliedUserInfo',select:'userName userImg _id'}})
+            .populate({path:'userInfo',select:'userName avatar _id'})
+            .populate({path:'repliedUserInfo',select:'userName avatar _id'})
+            .populate({path:'replyList', populate:{path:'replyUserInfo',select:'userName avatar _id'}})
+            .populate({path:'replyList', populate:{path:'repliedUserInfo',select:'userName avatar _id'}})
             .exec(callback)
     }
 }

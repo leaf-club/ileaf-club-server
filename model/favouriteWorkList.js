@@ -8,6 +8,7 @@ autoIncrement.initialize(connection);
 var favouriteWorkListSchema = new Schema({
     "userId":Number,
     "workId":Number,
+    "createTime":Number,
     "extra":String,
 });
 

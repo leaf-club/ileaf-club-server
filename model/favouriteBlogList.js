@@ -8,6 +8,7 @@ autoIncrement.initialize(connection);
 var favouriteBlogListSchema = new Schema({
     "userId":Number,
     "blogId":Number,
+    "createTime":Number,
     "extra":String,
 });
 

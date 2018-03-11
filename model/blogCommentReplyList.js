@@ -8,10 +8,9 @@ autoIncrement.initialize(connection);
 
 var blogCommentReplyListSchema = new Schema({
             "replyUserInfo":{type: Number, ref: 'User'},
-            "commentRepliedUserInfo":{type: Number, ref: 'User'},
+            "repliedUserInfo":{type: Number, ref: 'User'},
             "replyContent":String,
             "createTime":Number,
-            "replyPraiseCount":Number,
             "extra":String,
 });
 

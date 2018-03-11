@@ -7,37 +7,18 @@ autoIncrement.initialize(connection);
 
 var userSchema = new Schema({
     "userName":String,
-    "userPassword":String,
-    "userRegisteredTime":String,
-    "userImg":String,
-    "userPhone":String,
-    "userGender":Number,
-    "userStatus":Number,
-    "userNickname":String,
-    "userAddress":String,
-    "userFavouritesCount":{type:Number,default:0},
-    "userPraiseCount":{type:Number,default:0},
-    "favouriteBlogList":[{type:Number,ref:'FavouriteBlogList'}],
-    "favouriteWorkList":[{type:Number,ref:'FavouriteWorkList'}],
-    "praiseBlogList":[{type:Number,ref:'PraiseBlogList'}],
-    "praiseWorkList":[{type:Number,ref:'PraiseWorkList'}],
+    "password":String,
+    "registeredTime":String,
+    "avatar":String,
+    "phone":String,
+    "gender":Number,
+    "status":Number,
+    "address":String,
+    "favoriteNum":{type:Number,default:0},
+    "likeNum":{type:Number,default:0},
     "userIp":String,
     "extra":String,
 });
-
-userSchema.statics = {
-    findEverythings: function(userId,callback){
-        return this
-            .find({_id:userId})
-            .populate('favouriteBlogList')
-            .populate('favouriteWorkList')
-            .populate('praiseBlogList')
-            .populate('praiseWorkList')
-            .exec(callback)
-    }
-}
-
-
 
 userSchema.plugin(autoIncrement.plugin, 'User');
 

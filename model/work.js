@@ -7,19 +7,20 @@ autoIncrement.initialize(connection);
 
 var workSchema = new Schema({
             "userInfo":{type:Number,ref:'User'},
-            "workCreateTime":Number,
-            "workTiltle":String,
-            "workFileUrl":String,
-            "workTypeName":String,
-            "workTypeId":Number,
-            "workDescription":String,
+            "createTime":Number,
+            "title":String,
+            "url":String,
+            "typeName":String,
+            "typeId":Number,
+            "description":String,
+            "cover":String,
             "liked":{type:Boolean,default:false},
-            "praised":{type:Boolean,default:false},
-            "workCommentCount":Number,
-            "workPraiseCount":Number,
-            "workFavoriteCount":Number,
-            "workReadCount":Number,
-            "workUpdateTime":Number,
+            "favorited":{type:Boolean,default:false},
+            "commentNum":{type:Number,default:0},
+            "likeNum":{type:Number,default:0},
+            "favoriteNum":{type:Number,default:0},
+            "readNum":{type:Number,default:0},
+            "updateTime":Number,
             "extra":String,
         });
 
@@ -28,14 +29,14 @@ workSchema.statics = {
         return this
             .find()
             .limit(count)
-            .sort({blogCreateTime:1})
-            .populate({path:'userInfo',select:'userName userImg _id'})
+            .sort({createTime:-1})
+            .populate({path:'userInfo',select:'userName avatar _id'})
             .exec(callback)
             },
     findWorkDetail:function(id,callback){
         return this
             .find({_id:id})
-            .populate({path:'userInfo',select:'userName userImg _id'})
+            .populate({path:'userInfo',select:'userName avatar _id'})
             .exec(callback)
         }
 }

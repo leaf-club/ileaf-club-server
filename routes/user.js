@@ -2,6 +2,12 @@ var express = require('express');
 var router = express.Router();
 var mongoose = require('mongoose');
 var User = require('./../model/user');
+var Blog = require('./../model/blog');
+var Work = require('./../model/work');
+var FavouriteBlogList = require('./../model/favouriteBlogList');
+var FavouriteWorkList = require('./../model/favouriteWorkList');
+var LikeBlogList = require('./../model/likeBlogList');
+var LikeWorkList = require('./../model/likeWorkList');
 
 mongoose.connect('mongodb://127.0.0.1:27017/leafclub');
 
@@ -21,12 +27,14 @@ mongoose.connection.on("disconnected", function(){
 router.post('/register',function(req,res,next){
         //var userId = 1;
         var userName = 'LZZ';
-        var userPassword = '123456';
+        var password = '123456';
+        var avatar = './images/1.jpg'
         var newUser = new User();
 
         //newUser.userId = userId;
         newUser.userName = userName;
-        newUser.userPassword = userPassword;
+        newUser.password = password;
+        newUser.avatar = avatar;
     
         newUser.save(function(err,doc){
         if(err){
@@ -54,7 +62,7 @@ router.post('/register',function(req,res,next){
 router.post('/login',function(req,res,next){
     var param = {
         userName: req.body.userName,
-        userPassword: req.body.Password
+        password: req.body.password
     }
     User.findOne(param,function(err,doc){
         if(err){
@@ -134,53 +142,123 @@ router.post('/checkLogin',function(req,res,next){
     }
 })
 
-//获取收藏列表
-router.get('/getFavouriteList',function(req,res,next){
-    User.findEverythings({_id:userId},function(err,doc){
+//获取个人博客列表
+router.get('/getBlogList',function(req,res,next){
+    //let userId = req.cookies.userId;
+    let userId = req.param('userId');
+    let pageIndex = req.param('pageIndex');
+    let pageSize = req.param('pageSize');
+    let skip = (pageIndex-1)*pageSize;   //分页参数
+    
+    //筛选的时候要选出blogStatus为1的已发布的博文
+    let blogModel = Blog.find({userInfo:userId,status:1}).skip(skip).limit(pageSize);
+    blogModel.sort({createTime:-1});
+    blogModel.exec(function(err,doc){
+        if(err){
+            res.json({
+                status:'3201',
+                message: err.message
+            })
+        }else{
+            res.json({
+                result: {
+                    status:'200',
+                    message: '博客列表获取成功'
+                },
+                data: {
+                    blogList:doc
+                }
+            })
+        } 
+    })
+})
+
+//获取个人作品列表
+router.get('/getWorkList',function(req,res,next){
+    //let userId = req.cookies.userId;
+    let userId = req.param('userId');
+    let pageIndex = req.param('pageIndex');
+    let pageSize = req.param('pageSize');
+    let skip = (pageIndex-1)*pageSize;   //分页参数
+    
+    let workModel = Work.find({userInfo:userId}).skip(skip).limit(pageSize);
+    workModel.exec(function(err,doc){
         if(err){
             res.json({
                 result:{
-                    status:'304',
+                    status: '304',
                     message: err.message
-                }
+                } 
             })
         }else{
             res.json({
                 result:{
-                    status:'200',
-                    message:'success'
-                },
+                    status: '200',
+                    message: 'success'
+                },       
                 data: {
-                    favouriteBlogList: doc.favouriteBlogList,
-                    favouriteWorkList: doc.favouriteWorkList
+                    workList: doc
                 }
             })
         }
     })
 })
 
+//获取收藏列表
+router.get('/getFavouriteList',function(req,res,next){
+    //var userId = req.cookies.userId;
+    var userId = req.param('userId');
+    FavouriteBlogList.find({userId:userId}).then(function(err,doc){
+        FavouriteWorkList.find({userId:userId},function(err,doc1){
+            if(err){
+                res.json({
+                    result:{
+                        status:'302',
+                        message: err.message
+                    }
+                })
+            }else{
+                res.json({
+                    result:{
+                        status:'200',
+                        message:'success'
+                    },    
+                    data: {
+                        favouriteBlogList: doc,
+                        favouriteWorkList: doc1
+                    }
+                })
+            }
+        })
+    })
+})
+
 //获取点赞列表
-router.get('/getPraiseList',function(req,res,next){
-    User.findEverythings({_id:userId},function(err,doc){
-        if(err){
-            res.json({
-                result:{
-                    status:'302',
-                    message: err.message
-                }
-            })
-        }else{
-            res.json({
-                result:{
-                    status:'200',
-                    message:'success'
-                },    
-                data: {
-                    praiseBlogList: doc.praiseBlogList,
-                    praiseWorkList: doc.praiseWorkList
-                }
-            })
-        }
+router.get('/getLikeList',function(req,res,next){
+
+    var userId = req.param('userId');
+    LikeBlogList.find({userId:userId}).then(function(err,doc){
+        LikeWorkList.find({userId:userId},function(err,doc1){
+            if(err){
+                res.json({
+                    result:{
+                        status:'302',
+                        message: err.message
+                    }
+                })
+            }else{
+                res.json({
+                    result:{
+                        status:'200',
+                        message:'success'
+                    },    
+                    data: {
+                        likeBlogList: doc,
+                        likeWorkList: doc1
+                    }
+                })
+            }
+        })
     })
 })
 
