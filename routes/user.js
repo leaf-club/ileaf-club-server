@@ -146,8 +146,8 @@ router.post('/checkLogin',function(req,res,next){
 router.get('/getBlogList',function(req,res,next){
     //let userId = req.cookies.userId;
     let userId = req.param('userId');
-    let pageIndex = req.param('pageIndex');
-    let pageSize = req.param('pageSize');
+    let pageIndex = +req.param('pageIndex');
+    let pageSize = +req.param('pageSize');
     let skip = (pageIndex-1)*pageSize;   //分页参数
     
     //筛选的时候要选出blogStatus为1的已发布的博文
@@ -177,8 +177,8 @@ router.get('/getBlogList',function(req,res,next){
 router.get('/getWorkList',function(req,res,next){
     //let userId = req.cookies.userId;
     let userId = req.param('userId');
-    let pageIndex = req.param('pageIndex');
-    let pageSize = req.param('pageSize');
+    let pageIndex = +req.param('pageIndex');
+    let pageSize = +req.param('pageSize');
     let skip = (pageIndex-1)*pageSize;   //分页参数
     
     let workModel = Work.find({userInfo:userId}).skip(skip).limit(pageSize);
@@ -208,8 +208,10 @@ router.get('/getWorkList',function(req,res,next){
 router.get('/getFavouriteList',function(req,res,next){
     //var userId = req.cookies.userId;
     var userId = req.param('userId');
-    FavouriteBlogList.find({userId:userId}).then(function(err,doc){
-        FavouriteWorkList.find({userId:userId},function(err,doc1){
+    var favouriteBlogListModel = FavouriteBlogList.find({userId:userId}).sort({createTime:-1});
+    favouriteBlogListModel.exec().then(function(doc){
+        var favouriteWorkListModel = FavouriteBlogList.find({userId:userId}).sort({createTime:-1});
+        favouriteWorkListModel.exec({userId:userId},function(err,doc1){
             if(err){
                 res.json({
                     result:{
@@ -237,7 +239,8 @@ router.get('/getFavouriteList',function(req,res,next){
 router.get('/getLikeList',function(req,res,next){
 
     var userId = req.param('userId');
-    LikeBlogList.find({userId:userId}).then(function(err,doc){
+    var likeBlogListModel = LikeBlogList.find({userId:userId}).sort({createTime:-1});
+    likeBlogListModel.exec().then(function(doc){
         LikeWorkList.find({userId:userId},function(err,doc1){
             if(err){
                 res.json({

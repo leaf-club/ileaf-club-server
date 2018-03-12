@@ -29,7 +29,7 @@ router.post('/favorite',function(req,res,next){
                 })
             }else{
                 if(blogDoc){
-                    blogDoc.favoritesNum++;
+                    blogDoc.favoriteNum++;
                     blogDoc.save().then(function(blogDoc){
                         var favouriteBlog = new FavouriteBlogList();
                         favouriteBlog.userId = userId;
@@ -74,7 +74,7 @@ router.post('/favorite',function(req,res,next){
                 })
             }else{
                 if(workDoc){
-                    workDoc.favoritesNum++;
+                    workDoc.favoriteNum++;
                     workDoc.save().then(function(workDoc){
                         var favouriteWork = new FavouriteWorkList();
                         favouriteWork.userId = userId;
@@ -119,7 +119,7 @@ router.post('/favorite',function(req,res,next){
                 })
             }else{
                 if(blogDoc){
-                    blogDoc.favoritesNum--;
+                    blogDoc.favoriteNum--;
                     blogDoc.save().then(function(blogDoc){
                         FavouriteBlogList.remove({userId:userId,blogId:blogOrWorkId},function(err,doc){
                             if(err){
@@ -153,7 +153,7 @@ router.post('/favorite',function(req,res,next){
                 })
             }else{
                 if(workDoc){
-                    workDoc.favoritesNum--;
+                    workDoc.favoriteNum--;
                     workDoc.save().then(function(workDoc){
                         FavouriteWorkList.remove({userId:userId,workId:blogOrWorkId},function(err,doc){
                             if(err){

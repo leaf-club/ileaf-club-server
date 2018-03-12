@@ -55,8 +55,8 @@ router.post('/saveWork',function(req,res,next){
 
 //获取作品列表
 router.get('/getWorkList',function(req,res,next){
-    let pageIndex = req.param('pageIndex');
-    let pageSize = req.param('pageSize');
+    let pageIndex = +req.param('pageIndex');
+    let pageSize = +req.param('pageSize');
     let skip = (pageIndex-1)*pageSize;   //分页参数
     
     let workModel = Work.find().skip(skip).limit(pageSize);
@@ -87,8 +87,8 @@ router.get('/getWorkList',function(req,res,next){
 router.get('/getRecommendWorkList',function(req,res,next){
     //let userId = req.cookies.userId;
     let userId = req.param("userId");
-    let count = req.param('count');  
-    Work.findBlogs(count)
+    let count = +req.param('count');  
+    Work.findWorks(count)
     .then(function(docs){
         if(userId){
             FavouriteWorkList.find({userId:userId}).then(function(favouriteDocs){
