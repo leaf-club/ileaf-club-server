@@ -20,7 +20,7 @@ var blogSchema = new Schema({
             "favorited":{type:Boolean,default:false},
             "commentNum":{type:Number,default:0},
             "likeNum":{type:Number,default:0},
-            "favoritesNum":{type:Number,default:0},
+            "favoriteNum":{type:Number,default:0},
             "readNum":{type:Number,default:0},
             "updateTime":Number,
             "extra":String,

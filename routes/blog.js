@@ -143,8 +143,8 @@ router.post('/saveBlog',function(req,res,next){
 
 //获取博客列表
 router.get('/getBlogList',function(req,res,next){
-    let pageIndex = req.param('pageIndex');
-    let pageSize = req.param('pageSize');
+    let pageIndex = +req.param('pageIndex');
+    let pageSize = +req.param('pageSize');
     let skip = (pageIndex-1)*pageSize;   //分页参数
     
     //删选的时候要选出blogStatus为1的已发布的博文
@@ -174,25 +174,38 @@ router.get('/getBlogList',function(req,res,next){
 router.get('/getRecommendBlogList',function(req,res,next){
     //let userId = req.cookies.userId;
     let userId = req.param("userId");
-    let count = req.param('count');  
+    let count = +req.param('count');  
    Blog.findBlogs(count)
     .then(function(docs){
         if(userId){
             FavouriteBlogList.find({userId:userId}).then(function(favouriteDocs){
                 // var favouriteBlogList = userDocs.favouriteBlogList;
-                LikeBlogList.find({userId:userId}).then(function(likeDocs){
-                    docs.forEach(item=>{
-                        favouriteDocs.forEach(item1=>{
-                            if(item._id==item1){
-                                docs.favorited = true;
-                            }
-                        });
-                        likeDocs.forEach(item2=>{
-                            if(item._id==item2){
-                                docs.liked = true;
-                            }
-                        });
-                    });
+                    LikeBlogList.find({userId:userId}).then(function(likeDocs){
+                            docs.forEach(item=>{
+                                favouriteDocs.forEach(item1=>{
+                                    if(item._id==item1){
+                                        docs.favorited = true;
+                                    }
+                                });
+                                likeDocs.forEach(item2=>{
+                                    if(item._id==item2){
+                                        docs.liked = true;
+                                    }
+                                });
+                            });
+                            res.json({
+                                result:{
+                                    status:'200',
+                                    message:'success'
+                                },
+                                data: {
+                                    blogList:docs
+                                }
+                            })  
+                        })   
+                    })
+                 }
+                else{
                     res.json({
                         result:{
                             status:'200',
@@ -202,20 +215,8 @@ router.get('/getRecommendBlogList',function(req,res,next){
                             blogList:docs
                         }
                     })  
-                })    
+                } 
         })
-    }else{
-            res.json({
-                result:{
-                    status:'200',
-                    message:'success'
-                },
-                data: {
-                    blogList:docs
-                }
-            })  
-        } 
-    })
 })
 
 //获取博客详情，需要把阅读的数量+1
