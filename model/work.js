@@ -30,13 +30,13 @@ workSchema.statics = {
             .find()
             .limit(count)
             .sort({createTime:-1})
-            .populate({path:'userInfo',select:'userName avatar _id'})
+            .populate({path:'userInfo',select:'userName avatar contact _id'})
             .exec(callback)
             },
     findWorkDetail:function(id,callback){
         return this
             .find({_id:id})
-            .populate({path:'userInfo',select:'userName avatar _id'})
+            .populate({path:'userInfo',select:'userName avatar contact _id'})
             .exec(callback)
         }
 }

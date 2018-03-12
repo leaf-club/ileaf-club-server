@@ -32,13 +32,13 @@ blogSchema.statics = {
             .find({status:1})
             .limit(count)
             .sort({createTime:-1})
-            .populate({path:'userInfo',select:'userName avatar _id'})
+            .populate({path:'userInfo',select:'userName avatar contact _id'})
             .exec(callback)
         },
     findBlogDetail:function(id,callback){
         return this
         .find({_id:id})
-        .populate({path:'userInfo',select:'userName avatar _id'})
+        .populate({path:'userInfo',select:'userName avatar contact _id'})
         .exec(callback)
     }
 }

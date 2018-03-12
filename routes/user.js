@@ -228,7 +228,8 @@ router.get('/getBlogList',function(req,res,next){
     let skip = (pageIndex-1)*pageSize;   //分页参数
     
     //筛选的时候要选出blogStatus为1的已发布的博文
-    let blogModel = Blog.find({userInfo:userId,status:1}).skip(skip).limit(pageSize);
+    let blogModel = Blog.find({userInfo:userId,status:1}).skip(skip).limit(pageSize)
+        .populate({path:"userInfo",select:"userName avatar contact _id"});
     blogModel.sort({createTime:-1});
     blogModel.exec(function(err,doc){
         if(err){
