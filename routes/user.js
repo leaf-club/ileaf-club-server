@@ -28,7 +28,7 @@ router.post('/register',function(req,res,next){
         var userName = req.body.userName;
         var password = req.body.password;
         var contact = req.body.contact;
-        var avatar = 'https://image.baidu.com/search/detail?ct=503316480&z=0&ipn=d&word=ts&step_word=&hs=0&pn=25&spn=0&di=19235120190&pi=0&rn=1&tn=baiduimagedetail&is=0%2C0&istype=2&ie=utf-8&oe=utf-8&in=&cl=2&lm=-1&st=-1&cs=1759656977%2C2245891314&os=4144052532%2C1664649364&simid=0%2C0&adpicid=0&lpn=0&ln=1967&fr=&fmq=1520837949348_R&fm=result&ic=0&s=undefined&se=&sme=&tab=0&width=&height=&face=undefined&ist=&jit=&cg=&bdtype=0&oriquery=&objurl=http%3A%2F%2Fwww.jlonline.com%2Flady%2Fd%2Ffile%2F2017-11-13%2F6438d967080774916c867d3c3d398737.png&fromurl=ippr_z2C%24qAzdH3FAzdH3Fooo_z%26e3B3s5gstgj_z%26e3Bv54AzdH3Fsw1yAzdH3Fgjof-ma-8lmnn9-a_z%26e3Bip4s&gsm=0&rpstart=0&rpnum=0'
+        var avatar = 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1520856372350&di=16e737ec8db51023769db892e5b059a8&imgtype=0&src=http%3A%2F%2Fp1.gexing.com%2Fshaitu%2F20121005%2F1117%2F506e513777326.jpg'
         var newUser = new User();
 
         //newUser.userId = userId;
@@ -170,7 +170,7 @@ router.get('/getUserInfo',function(req,res,next){
                 }
             })
         }else{
-            if(doc){
+            if(userDoc){
                 res.json({
                     result: {
                         status: '200',
