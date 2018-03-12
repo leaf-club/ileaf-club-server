@@ -7,7 +7,7 @@ autoIncrement.initialize(connection);
 
 var blogSchema = new Schema({
             "userInfo":{type:Number, ref:'User'},
-            "createTime":Number,
+            "createTime":{type:Number,default:Date.now()},
             "title":String,
             "abstract":String,
             "htmlCode":String,
@@ -22,11 +22,20 @@ var blogSchema = new Schema({
             "likeNum":{type:Number,default:0},
             "favoriteNum":{type:Number,default:0},
             "readNum":{type:Number,default:0},
-            "updateTime":Number,
+            "updateTime":{type:Number,default:Date.now()},
             "extra":String,
         });
 
 blogSchema.statics = {
+    findBlogList: function(skip,pageSize,callback){
+        return this
+            .find({status:1})
+            .skip(skip)
+            .limit(pageSize)
+            .sort({createTime:-1})
+            .populate({path:'userInfo',select:'userName avatar contact _id'})
+            .exec(callback)
+        },
     findBlogs: function(count,callback){
         return this
             .find({status:1})
@@ -37,7 +46,7 @@ blogSchema.statics = {
         },
     findBlogDetail:function(id,callback){
         return this
-        .find({_id:id})
+        .findOne({_id:id})
         .populate({path:'userInfo',select:'userName avatar contact _id'})
         .exec(callback)
     }

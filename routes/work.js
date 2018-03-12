@@ -12,7 +12,6 @@ var larger = require('./../util/util');
 //保存作品
 router.post('/saveWork',function(req,res,next){
     var userId = req.body.userId,  //获取当前用户
-        createTime = Date.now(),
         url = req.body.url,
         title = req.body.title,
         description = req.body.description;
@@ -22,7 +21,6 @@ router.post('/saveWork',function(req,res,next){
 
         var work = new Work({
             userInfo: userId,
-            createTime:createTime,
             url:url,
             title:title,
             description:description,
@@ -57,25 +55,37 @@ router.get('/getWorkList',function(req,res,next){
     let pageSize = +req.param('pageSize');
     let skip = (pageIndex-1)*pageSize;   //分页参数
     
-    let workModel = Work.find().skip(skip).limit(pageSize).populate({path:"userInfo",select:"userName avatar contact _id"});
-    workModel.sort({createTime:-1});
-    workModel.exec(function(err,doc){
-        if(err){
+    Work.fingWorkList(skip, pageSize, function (err, docs) {
+        if (err) {
             res.json({
-                result:{
-                    status: '304',
-                    message: err.message
-                } 
+                status: '3201',
+                message: err.message
             })
-        }else{
-            res.json({
-                result:{
-                    status: '200',
-                    message: 'success'
-                },       
-                data: {
-                    workList: doc
-                }
+        } else {
+            FavouriteList.find({ userId: userId, type: 1 }).then(function (favouriteDocs) {
+                LikeList.find({ userId: userId, type: 1 }).then(function (likeDocs) {
+                    docs.forEach(item => {
+                        favouriteDocs.forEach(item1 => {
+                            if (item._id == item1) {
+                                docs.favorited = true;
+                            }
+                        });
+                        likeDocs.forEach(item2 => {
+                            if (item._id == item2) {
+                                docs.liked = true;
+                            }
+                        });
+                    });
+                    res.json({
+                        result: {
+                            status: '200',
+                            message: 'success'
+                        },
+                        data: {
+                            workList: docs
+                        }
+                    })
+                })
             })
         }
     })

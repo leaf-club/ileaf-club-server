@@ -6,12 +6,32 @@ var connection = mongoose.createConnection("mongodb://127.0.0.1:27017/leafclub")
 autoIncrement.initialize(connection);
 
 var favouriteListSchema = new Schema({
-    "userId":Number,
-    "blogOrWorkId":Number,
+    "userId":{type:Number, ref:"User"},
+    "blogId":{type:Number, ref:"Blog"},
+    "workId":{type:Number, ref:"Work"},
     "type":Number,
     "createTime":Number,
     "extra":String,
 });
+
+favouriteListSchema.statics = {
+    findfavouriteBlogs: function(userId,callback){
+        return this
+            .find({userId:userId,type:0})
+            .sort({createTime:-1})
+            .populate({path:'userInfo',select:'userName avatar contact _id'})
+            .populate("blogId")
+            .exec(callback)
+            },
+    findfavouriteWorks: function(userId,callback){
+        return this
+            .find({userId:userId,type:1})
+            .sort({createTime:-1})
+            .populate({path:'userInfo',select:'userName avatar contact _id'})
+            .populate("workId")
+            .exec(callback)
+            }
+}
 
 favouriteListSchema.plugin(autoIncrement.plugin, 'FavouriteList');
 

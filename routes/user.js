@@ -194,6 +194,7 @@ router.get('/getUserInfo',function(req,res,next){
 
 //获取文章数，作品数，收藏数，点赞数，草稿数
 router.get('/getCounts',function(req,res,next){
+    var userId = req.param("userId");
     Blog.find({userId:userId,status:1}).then(function(blogDoc){
         Work.find({userId:userId}).then(function(workDoc){
             FavouriteList.find({userId:userId}).then(function(FavouriteList){
@@ -284,66 +285,77 @@ router.get('/getWorkList',function(req,res,next){
 
 //获取收藏列表
 router.get('/getFavouriteList',function(req,res,next){
-    //var userId = req.cookies.userId;
     var userId = req.param('userId');
-    var favouriteBlogListModel = FavouriteList.find({userId:userId,type:0}).sort({createTime:-1});
-    favouriteBlogListModel.exec().then(function(doc){
-        var favouriteWorkListModel = FavouriteList.find({userId:userId,type:1}).sort({createTime:-1});
-        favouriteWorkListModel.exec(function(err,doc1){
-            if(err){
-                res.json({
-                    result:{
-                        status:'302',
-                        message: err.message
-                    }
-                })
-            }else{
-                res.json({
-                    result:{
-                        status:'200',
-                        message:'success'
-                    },    
-                    data: {
-                        favouriteBlogList: doc,
-                        favouriteWorkList: doc1
-                    }
-                })
-            }
-        })
-    })
+    FavouriteList.findfavouriteBlogs(userId,function(err,doc){
+        if(err){
+            res.json({
+                result:{
+                    status:'302',
+                    message: err.message
+                }
+            })
+        }else{
+            FavouriteList.findfavouriteWorks(userId,function(err,doc1){
+                if(err){
+                    res.json({
+                        result:{
+                            status:'302',
+                            message: err.message
+                        }
+                    })
+                }else{
+                        res.json({
+                            result:{
+                                status:'200',
+                                message:'success'
+                            },    
+                            data: {
+                                favoriteBlogList: doc,
+                                favoriteWorkList: doc1
+                            }
+                        })
+                }
+            })
+        }
+    })        
 })
 
 //获取点赞列表
 router.get('/getLikeList',function(req,res,next){
-
     var userId = req.param('userId');
-    var likeBlogListModel = LikeList.find({userId:userId,type:0}).sort({createTime:-1});
-    likeBlogListModel.exec().then(function(doc){
-        var likeWorkListModel =  LikeList.find({userId:userId,type:1}).sort({createTime:-1});
-        likeWorkListModel.exec(function(err,doc1){
-            if(err){
-                res.json({
-                    result:{
-                        status:'302',
-                        message: err.message
-                    }
-                })
-            }else{
-                res.json({
-                    result:{
-                        status:'200',
-                        message:'success'
-                    },    
-                    data: {
-                        likeBlogList: doc,
-                        likeWorkList: doc1
-                    }
-                })
-            }
-        })
-    })
+    LikeList.findLikeBlogs(userId,function(err,doc){
+        if(err){
+            res.json({
+                result:{
+                    status:'302',
+                    message: err.message
+                }
+            })
+        }else{
+            LikeList.findLikeWorks(userId,function(err,doc1){
+                if(err){
+                    res.json({
+                        result:{
+                            status:'302',
+                            message: err.message
+                        }
+                    })
+                }else{
+                        res.json({
+                            result:{
+                                status:'200',
+                                message:'success'
+                            },    
+                            data: {
+                                likeBlogList: doc,
+                                likeWorkList: doc1
+                            }
+                        })
+                }
+            })
+        }
+    })                 
 })
-
 
 //获取草稿列表
 router.get('/getDraft',function(req,res,next){

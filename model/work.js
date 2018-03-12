@@ -7,7 +7,7 @@ autoIncrement.initialize(connection);
 
 var workSchema = new Schema({
             "userInfo":{type:Number,ref:'User'},
-            "createTime":Number,
+            "createTime":{type:Number,default:Date.now()},
             "title":String,
             "url":String,
             "typeName":String,
@@ -20,11 +20,20 @@ var workSchema = new Schema({
             "likeNum":{type:Number,default:0},
             "favoriteNum":{type:Number,default:0},
             "readNum":{type:Number,default:0},
-            "updateTime":Number,
+            "updateTime":{type:Number,default:Date.now()},
             "extra":String,
         });
 
 workSchema.statics = {
+    findWorkList: function(skip,pageSize,callback){
+        return this
+            .find()
+            .skip(skip)
+            .limit(pageSize)
+            .sort({createTime:-1})
+            .populate({path:'userInfo',select:'userName avatar contact _id'})
+            .exec(callback)
+            },
     findWorks: function(count,callback){
         return this
             .find()
@@ -35,7 +44,7 @@ workSchema.statics = {
             },
     findWorkDetail:function(id,callback){
         return this
-            .find({_id:id})
+            .findOne({_id:id})
             .populate({path:'userInfo',select:'userName avatar contact _id'})
             .exec(callback)
         }
