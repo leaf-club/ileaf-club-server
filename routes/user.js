@@ -132,21 +132,26 @@ router.post('/logout',function(req,res,next){
 })
 
 //检查是否登录
-router.post('/checkLogin',function(req,res,next){
+router.get('/checkLogin',function(req,res,next){
     if(req.cookies.userId){
         res.json({
         result:{
-            status:'0',
+            status:'200',
             message:'登录',
         },
         data:{
-            userName:req.cookies.userName
+            userInfo:{
+                userId: req.cookies.userId,
+                userName: req.cookies.userName,
+                avatar: req.cookies.avatar,
+                contact: req.cookies.contact
+            } 
             }
         });
       }else{
         res.json({
             result:{
-                status:'1',
+                status:'302',
                 message:'未登录'
             }
         });
@@ -193,11 +198,20 @@ router.get('/getCounts',function(req,res,next){
         Work.find({userId:userId}).then(function(workDoc){
             FavouriteList.find({userId:userId}).then(function(FavouriteList){
                 LikeList.find({userId:userId}).then(function(LikeList){
-                    res.json({
-                        blogCount:blogDoc.length,
-                        workCount:workDoc.length,
-                        favoriteCount:FavouriteList.length,
-                        likeCount:LikeList.length,
+                    Blog.find({userId:userId,status:1}).then(function(draftDoc){
+                        res.json({
+                            result:{
+                                status:'200',
+                                message:'success'
+                            },
+                            data:{
+                                blogCount:blogDoc.length,
+                                workCount:workDoc.length,
+                                favoriteCount:FavouriteList.length,
+                                likeCount:LikeList.length,
+                                draftCount:draftDoc.length
+                            }
+                        })
                     })
                 })
             })
