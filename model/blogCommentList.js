@@ -24,10 +24,10 @@ blogCommentListSchema.statics = {
     findUserByCommentId: function(blogId,callback){
         return this
             .find({blogId:blogId})
-            .populate({path:'userInfo',select:'userName avatar _id'})
-            .populate({path:'repliedUserInfo',select:'userName avatar _id'})
-            .populate({path:'replyList', populate:{path:'replyUserInfo',select:'userName avatar _id'}})
-            .populate({path:'replyList', populate:{path:'repliedUserInfo',select:'userName avatar _id'}})
+            .populate({path:'userInfo',select:'userName avatar contact _id'})
+            .populate({path:'repliedUserInfo',select:'userName avatar contact _id'})
+            .populate({path:'replyList', populate:{path:'replyUserInfo',select:'userName avatar contact _id'}})
+            .populate({path:'replyList', populate:{path:'repliedUserInfo',select:'userName avatar contact _id'}})
             .exec(callback)
     }
 }

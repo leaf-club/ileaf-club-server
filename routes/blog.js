@@ -146,7 +146,7 @@ router.get('/getBlogList',function(req,res,next){
     let skip = (pageIndex-1)*pageSize;   //分页参数
     
     //删选的时候要选出blogStatus为1的已发布的博文
-    let blogModel = Blog.find({status:1}).skip(skip).limit(pageSize);
+    let blogModel = Blog.find({status:1}).skip(skip).limit(pageSize).populate({path:"userInfo",select:"userName avatar _id contact"});
     blogModel.sort({createTime:-1});
     blogModel.exec(function(err,doc){
         if(err){

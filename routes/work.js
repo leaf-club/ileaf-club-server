@@ -57,7 +57,7 @@ router.get('/getWorkList',function(req,res,next){
     let pageSize = +req.param('pageSize');
     let skip = (pageIndex-1)*pageSize;   //分页参数
     
-    let workModel = Work.find().skip(skip).limit(pageSize);
+    let workModel = Work.find().skip(skip).limit(pageSize).populate({path:"userInfo",select:"userName avatar contact _id"});
     workModel.sort({createTime:-1});
     workModel.exec(function(err,doc){
         if(err){
