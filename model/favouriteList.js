@@ -13,6 +13,6 @@ var favouriteListSchema = new Schema({
     "extra":String,
 });
 
-favouriteBlogListSchema.plugin(autoIncrement.plugin, 'FavouriteList');
+favouriteListSchema.plugin(autoIncrement.plugin, 'FavouriteList');
 
 module.exports = mongoose.model('FavouriteList',favouriteListSchema);
