@@ -5,14 +5,14 @@ var Schema = mongoose.Schema;
 var connection = mongoose.createConnection("mongodb://127.0.0.1:27017/leafclub");
 autoIncrement.initialize(connection);
 
-var likeWorkListSchema = new Schema({
+var likeListSchema = new Schema({
     "userId":Number,
-    "workId":Number,
+    "blogId":Number,
+    "type":Number,
     "createTime":Number,
     "extra":String,
 });
 
+likeListSchema.plugin(autoIncrement.plugin, 'LikeList');
 
-likeWorkListSchema.plugin(autoIncrement.plugin, 'LikeWorkList');
-
-module.exports = mongoose.model('LikeWorkList',likeWorkListSchema);
+module.exports = mongoose.model('LikeList',likeListSchema);

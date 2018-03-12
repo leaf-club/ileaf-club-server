@@ -91,9 +91,9 @@ router.get('/getRecommendWorkList',function(req,res,next){
     Work.findWorks(count)
     .then(function(docs){
         if(userId){
-            FavouriteWorkList.find({userId:userId}).then(function(favouriteDocs){
+            FavouriteList.find({userId:userId,type:0}).then(function(favouriteDocs){
                 // var favouriteBlogList = userDocs.favouriteBlogList;
-                LikeWorkList.find({userId:userId}).then(function(likeDocs){
+                LikeList.find({userId:userId,type:1}).then(function(likeDocs){
                     docs.forEach(item=>{
                         favouriteDocs.forEach(item1=>{
                             if(item._id==item1){

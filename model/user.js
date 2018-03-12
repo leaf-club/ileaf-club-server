@@ -10,7 +10,7 @@ var userSchema = new Schema({
     "password":String,
     "registeredTime":String,
     "avatar":String,
-    "phone":String,
+    "contact":String,
     "gender":Number,
     "status":Number,
     "address":String,
