@@ -132,21 +132,26 @@ router.post('/logout',function(req,res,next){
 })
 
 //检查是否登录
-router.post('/checkLogin',function(req,res,next){
+router.get('/checkLogin',function(req,res,next){
     if(req.cookies.userId){
         res.json({
         result:{
-            status:'0',
+            status:'200',
             message:'登录',
         },
         data:{
-            userName:req.cookies.userName
+            userInfo:{
+                userId: req.cookies.userId,
+                userName: req.cookies.userName,
+                avatar: req.cookies.avatar,
+                contact: req.cookies.contact
+            } 
             }
         });
       }else{
         res.json({
             result:{
-                status:'1',
+                status:'302',
                 message:'未登录'
             }
         });
