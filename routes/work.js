@@ -4,10 +4,8 @@ var mongoose = require('mongoose');
 var Work = require('./../model/work');
 var WorkCommentList = require('./../model/workCommentList');
 var WorkCommentReplyList = require('./../model/workCommentReplyList');
-var FavouriteBlogList = require('./../model/favouriteBlogList');
-var FavouriteWorkList = require('./../model/favouriteWorkList');
-var LikeBlogList = require('./../model/likeBlogList');
-var LikeWorkList = require('./../model/likeWorkList');
+var FavouriteList = require('./../model/favouriteList');
+var LikeList = require('./../model/likeList');
 var larger = require('./../util/util');
 
 
@@ -91,9 +89,9 @@ router.get('/getRecommendWorkList',function(req,res,next){
     Work.findWorks(count)
     .then(function(docs){
         if(userId){
-            FavouriteWorkList.find({userId:userId}).then(function(favouriteDocs){
+            FavouriteList.find({userId:userId,type:0}).then(function(favouriteDocs){
                 // var favouriteBlogList = userDocs.favouriteBlogList;
-                LikeWorkList.find({userId:userId}).then(function(likeDocs){
+                LikeList.find({userId:userId,type:1}).then(function(likeDocs){
                     docs.forEach(item=>{
                         favouriteDocs.forEach(item1=>{
                             if(item._id==item1){

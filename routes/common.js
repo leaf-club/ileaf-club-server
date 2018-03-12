@@ -3,10 +3,8 @@ var router = express.Router();
 var mongoose = require('mongoose');
 var User = require('./../model/user');
 var Blog = require('./../model/blog');
-var FavouriteBlogList = require('./../model/favouriteBlogList');
-var FavouriteWorkList = require('./../model/favouriteWorkList');
-var LikeBlogList = require('./../model/likeBlogList');
-var LikeWorkList = require('./../model/likeWorkList');
+var FavouriteList = require('./../model/favouriteList');
+var LikeList = require('./../model/likeList');
 
 //博客收藏，需要把收藏量+1
 router.post('/favorite',function(req,res,next){
@@ -31,9 +29,10 @@ router.post('/favorite',function(req,res,next){
                 if(blogDoc){
                     blogDoc.favoriteNum++;
                     blogDoc.save().then(function(blogDoc){
-                        var favouriteBlog = new FavouriteBlogList();
+                        var favouriteBlog = new FavouriteList();
                         favouriteBlog.userId = userId;
                         favouriteBlog.blogId = blogOrWorkId;
+                        favouriteBlog.type = type;
                         favouriteBlog.createTime = createTime;
                         favouriteBlog.save(function(err,doc){
                             if(err){
@@ -76,9 +75,10 @@ router.post('/favorite',function(req,res,next){
                 if(workDoc){
                     workDoc.favoriteNum++;
                     workDoc.save().then(function(workDoc){
-                        var favouriteWork = new FavouriteWorkList();
+                        var favouriteWork = new FavouriteList();
                         favouriteWork.userId = userId;
                         favouriteWork.workId = blogOrWorkId;
+                        favouriteWork.type = type;
                         favouriteWork.createTime = createTime;
                         favouriteWork.save(function(err,doc){
                             if(err){
@@ -121,7 +121,7 @@ router.post('/favorite',function(req,res,next){
                 if(blogDoc){
                     blogDoc.favoriteNum--;
                     blogDoc.save().then(function(blogDoc){
-                        FavouriteBlogList.remove({userId:userId,blogId:blogOrWorkId},function(err,doc){
+                        FavouriteList.remove({userId:userId,blogId:blogOrWorkId,type:type},function(err,doc){
                             if(err){
                                 res.json({
                                     result:{
@@ -155,7 +155,7 @@ router.post('/favorite',function(req,res,next){
                 if(workDoc){
                     workDoc.favoriteNum--;
                     workDoc.save().then(function(workDoc){
-                        FavouriteWorkList.remove({userId:userId,workId:blogOrWorkId},function(err,doc){
+                        FavouriteList.remove({userId:userId,workId:blogOrWorkId,type:type},function(err,doc){
                             if(err){
                                 res.json({
                                     result:{
@@ -202,9 +202,10 @@ router.post('/like',function(req,res,next){
                 if(blogDoc){
                     blogDoc.likeNum++;
                     blogDoc.save().then(function(blogDoc){
-                        var likeBlog = new LikeBlogList();
+                        var likeBlog = new LikeList();
                         likeBlog.userId = userId;
                         likeBlog.blogId = blogOrWorkId;
+                        likeBlog.type = type;
                         likeBlog.createTime = createTime;
                         likeBlog.save(function(err,doc){
                             if(err){
@@ -247,9 +248,10 @@ router.post('/like',function(req,res,next){
                 if(workDoc){
                     workDoc.likeNum++;
                     workDoc.save().then(function(workDoc){
-                        var likeWork = new LikeWorkList();
+                        var likeWork = new LikeList();
                         likeWork.userId = userId;
                         likeWork.workId = blogOrWorkId;
+                        likeWork.type = type;
                         likeWork.createTime = createTime;
                         likeWork.save(function(err,doc){
                             if(err){
@@ -292,7 +294,7 @@ router.post('/like',function(req,res,next){
                 if(blogDoc){
                     blogDoc.likeNum--;
                     blogDoc.save().then(function(blogDoc){
-                        LikeWorkList.remove({userId:userId,blogId:blogOrWorkId},function(err,doc){
+                        LikeList.remove({userId:userId,blogId:blogOrWorkId,type:type},function(err,doc){
                             if(err){
                                 res.json({
                                     result:{
@@ -326,7 +328,7 @@ router.post('/like',function(req,res,next){
                 if(workDoc){
                     workDoc.likeNum--;
                     workDoc.save().then(function(workDoc){
-                        LikeWorkList.remove({userId:userId,workId:blogOrWorkId},function(err,doc){
+                        LikeList.remove({userId:userId,workId:blogOrWorkId,type:type},function(err,doc){
                             if(err){
                                 res.json({
                                     result:{

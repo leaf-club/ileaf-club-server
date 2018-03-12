@@ -5,10 +5,8 @@ var Blog = require('./../model/blog');
 var User = require('./../model/user');
 var BlogCommentList = require('./../model/blogCommentList');
 var BlogCommentReplyList = require('./../model/blogCommentReplyList');
-var FavouriteBlogList = require('./../model/favouriteBlogList');
-var FavouriteWorkList = require('./../model/favouriteWorkList');
-var LikeBlogList = require('./../model/likeBlogList');
-var LikeWorkList = require('./../model/likeWorkList');
+var FavouriteList = require('./../model/favouriteList');
+var LikeList = require('./../model/likeList');
 var larger = require('./../util/util');
 var selectTypeName = require('./../util/enumerator');
 
@@ -178,9 +176,9 @@ router.get('/getRecommendBlogList',function(req,res,next){
    Blog.findBlogs(count)
     .then(function(docs){
         if(userId){
-            FavouriteBlogList.find({userId:userId}).then(function(favouriteDocs){
+            FavouriteList.find({userId:userId,type:0}).then(function(favouriteDocs){
                 // var favouriteBlogList = userDocs.favouriteBlogList;
-                    LikeBlogList.find({userId:userId}).then(function(likeDocs){
+                    LikeList.find({userId:userId,type:0}).then(function(likeDocs){
                             docs.forEach(item=>{
                                 favouriteDocs.forEach(item1=>{
                                     if(item._id==item1){
