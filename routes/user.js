@@ -193,11 +193,20 @@ router.get('/getCounts',function(req,res,next){
         Work.find({userId:userId}).then(function(workDoc){
             FavouriteList.find({userId:userId}).then(function(FavouriteList){
                 LikeList.find({userId:userId}).then(function(LikeList){
-                    res.json({
-                        blogCount:blogDoc.length,
-                        workCount:workDoc.length,
-                        favoriteCount:FavouriteList.length,
-                        likeCount:LikeList.length,
+                    Blog.find({userId:userId,status:1}).then(function(draftDoc){
+                        res.json({
+                            result:{
+                                status:'200',
+                                message:'success'
+                            },
+                            data:{
+                                blogCount:blogDoc.length,
+                                workCount:workDoc.length,
+                                favoriteCount:FavouriteList.length,
+                                likeCount:LikeList.length,
+                                draftCount:draftDoc.length
+                            }
+                        })
                     })
                 })
             })
