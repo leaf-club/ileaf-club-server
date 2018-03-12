@@ -189,11 +189,20 @@ router.get('/getUserInfo',function(req,res,next){
 
 //获取文章数，作品数，收藏数，点赞数，草稿数
 router.get('/getCounts',function(req,res,next){
-    // Blog.find({userId:userId,status:1}).then(function(blogDoc){
-    //     Work.find({userId:userId}).then(function(workDoc){
-    //         FavouriteBlogList.find({userId:userId}).then(function(FavouriteBlogList))
-    //     })
-    // })
+    Blog.find({userId:userId,status:1}).then(function(blogDoc){
+        Work.find({userId:userId}).then(function(workDoc){
+            FavouriteList.find({userId:userId}).then(function(FavouriteList){
+                LikeList.find({userId:userId}).then(function(LikeList){
+                    res.json({
+                        blogCount:blogDoc.length,
+                        workCount:workDoc.length,
+                        favoriteCount:FavouriteList.length,
+                        likeCount:LikeList.length,
+                    })
+                })
+            })
+        })
+    })
 })
 
 //获取个人博客列表

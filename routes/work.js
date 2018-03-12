@@ -4,10 +4,8 @@ var mongoose = require('mongoose');
 var Work = require('./../model/work');
 var WorkCommentList = require('./../model/workCommentList');
 var WorkCommentReplyList = require('./../model/workCommentReplyList');
-var FavouriteBlogList = require('./../model/favouriteBlogList');
-var FavouriteWorkList = require('./../model/favouriteWorkList');
-var LikeBlogList = require('./../model/likeBlogList');
-var LikeWorkList = require('./../model/likeWorkList');
+var FavouriteList = require('./../model/favouriteList');
+var LikeList = require('./../model/likeList');
 var larger = require('./../util/util');
 
 
