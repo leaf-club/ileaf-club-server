@@ -15,14 +15,14 @@ var favouriteListSchema = new Schema({
 });
 
 favouriteListSchema.statics = {
-    findfavouriteBlogs: function(userId,callback){
+    findFavouriteBlogs: function(userId,callback){
         return this
-            .find({userId:userId,type:0})
+            .find({userId:userId})
             .sort({createTime:-1})
             .populate({path:"blogId",populate:{path:"userInfo",select:'userName avatar contact _id'}})
             .exec(callback)
             },
-    findfavouriteWorks: function(userId,callback){
+    findFavouriteWorks: function(userId,callback){
         return this
             .find({userId:userId,type:1})
             .sort({createTime:-1})

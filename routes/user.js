@@ -83,15 +83,16 @@ router.post('/login',function(req,res,next){
         }else{
             if(doc){
                 //验证成功后，把信息添加到cookie中
-                res.cookie("userId",doc._id,{
-                    path:'/',
-                    maxAge:1000*60*60
-                  });
+                // res.cookie("userId",doc._id,{
+                //     path:'/',
+                //     maxAge:1000*60*60
+                //   });
       
-                res.cookie("userName",doc.userName,{
-                    path:'/',
-                    maxAge:1000*60*60
-                  });
+                // res.cookie("userName",doc.userName,{
+                //     path:'/',
+                //     maxAge:1000*60*60
+                //   });
+                req.session.userId = doc._id;
 
                 res.json({
                     result:{
@@ -135,19 +136,19 @@ router.post('/logout',function(req,res,next){
 
 //检查是否登录
 router.get('/checkLogin',function(req,res,next){
-    if(req.cookies.userId){
+    if(req.session.userId){
         res.json({
         result:{
             status:'200',
             message:'登录',
         },
         data:{
-            userInfo:{
-                userId: req.cookies.userId,
-                userName: req.cookies.userName,
-                avatar: req.cookies.avatar,
-                contact: req.cookies.contact
-            } 
+                userInfo:{
+                    userId: req.cookies.userId,
+                    userName: req.cookies.userName,
+                    avatar: req.cookies.avatar,
+                    contact: req.cookies.contact
+                } 
             }
         });
       }else{
@@ -287,8 +288,8 @@ router.get('/getWorkList',function(req,res,next){
 
 //获取收藏列表
 router.get('/getFavouriteList',function(req,res,next){
-    var userId = req.param('userId');
-    FavouriteList.findfavouriteBlogs(userId,function(err,doc){
+    var userId = +req.param("userId");
+    FavouriteList.findFavouriteBlogs(userId,function(err,doc){
         if(err){
             res.json({
                 result:{
@@ -297,7 +298,7 @@ router.get('/getFavouriteList',function(req,res,next){
                 }
             })
         }else{
-            FavouriteList.findfavouriteWorks(userId,function(err,doc1){
+            FavouriteList.findFavouriteWorks(userId,function(err,doc1){
                 if(err){
                     res.json({
                         result:{
@@ -306,14 +307,22 @@ router.get('/getFavouriteList',function(req,res,next){
                         }
                     })
                 }else{
+                        var favouriteBlogList = [];
+                        var favouriteWorkList = [];
+                        doc.forEach(item=>{
+                            favouriteBlogList.push(item.blogId);
+                        });
+                        doc1.forEach(item=>{
+                            favouriteWorkList.push(item.workId);
+                        });
                         res.json({
                             result:{
                                 status:'200',
                                 message:'success'
                             },    
                             data: {
-                                favoriteBlogList: doc.blogId,
-                                favoriteWorkList: doc1.workId
+                                favouriteBlogList: favouriteBlogList,
+                                favouriteWorkList: favouriteWorkList
                             }
                         })
                 }
@@ -343,14 +352,22 @@ router.get('/getLikeList',function(req,res,next){
                         }
                     })
                 }else{
+                        var likeBlogList = [];
+                        var likeWorkList = [];
+                        doc.forEach(item=>{
+                            likeBlogList.push(item.blogId);
+                        });
+                        doc1.forEach(item=>{
+                            likeWorkList.push(item.workId);
+                        });
                         res.json({
                             result:{
                                 status:'200',
                                 message:'success'
                             },    
                             data: {
-                                likeBlogList: doc.blogId,
-                                likeWorkList: doc1.workId
+                                likeBlogList: likeBlogList,
+                                likeWorkList: likeWorkList
                             }
                         })
                 }
