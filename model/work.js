@@ -7,7 +7,7 @@ autoIncrement.initialize(connection);
 
 var workSchema = new Schema({
             "userInfo":{type:Number,ref:'User'},
-            "createTime":{type:Number,default:Date.now()},
+            "createTime":Number,
             "title":String,
             "url":String,
             "typeName":String,
@@ -20,7 +20,7 @@ var workSchema = new Schema({
             "likeNum":{type:Number,default:0},
             "favoriteNum":{type:Number,default:0},
             "readNum":{type:Number,default:0},
-            "updateTime":{type:Number,default:Date.now()},
+            "updateTime":Number,
             "extra":String,
         });
 
