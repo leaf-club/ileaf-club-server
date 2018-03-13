@@ -47,6 +47,9 @@ router.post('/favorite',function(req,res,next){
                                     result:{
                                         status:'200',
                                         message: 'success'
+                                    },
+                                    data: {
+                                        favoriteNum: blogDoc.favoriteNum
                                     }
                                 })
                             }
@@ -93,6 +96,9 @@ router.post('/favorite',function(req,res,next){
                                     result:{
                                         status:'200',
                                         message: 'success'
+                                    },
+                                    data: {
+                                        favoriteNum: workDoc.favoriteNum
                                     }
                                 })
                             }
@@ -134,6 +140,9 @@ router.post('/favorite',function(req,res,next){
                                     result:{
                                         status:'200',
                                         message: '取消收藏成功'
+                                    },
+                                    data: {
+                                        favoriteNum: blogDoc.favoriteNum
                                     }
                                 })
                             }
@@ -168,6 +177,9 @@ router.post('/favorite',function(req,res,next){
                                     result:{
                                         status:'200',
                                         message: '取消收藏成功'
+                                    },
+                                    data: {
+                                        favoriteNum: workDoc.favoriteNum
                                     }
                                 })
                             }
@@ -220,6 +232,9 @@ router.post('/like',function(req,res,next){
                                     result:{
                                         status:'200',
                                         message: 'success'
+                                    },
+                                    data: {
+                                        likeNum: blogDoc.likeNum
                                     }
                                 })
                             }
@@ -266,6 +281,9 @@ router.post('/like',function(req,res,next){
                                     result:{
                                         status:'200',
                                         message: 'success'
+                                    },
+                                    data: {
+                                        likeNum: workDoc.likeNum
                                     }
                                 })
                             }
@@ -307,6 +325,9 @@ router.post('/like',function(req,res,next){
                                     result:{
                                         status:'200',
                                         message: '取消收藏成功'
+                                    },
+                                    data: {
+                                        likeNum: blogDoc.likeNum
                                     }
                                 })
                             }
@@ -334,6 +355,9 @@ router.post('/like',function(req,res,next){
                                     result:{
                                         status:'304',
                                         message: err.message
+                                    },
+                                    data: {
+                                        likeNum: workDoc.likeNum
                                     }
                                 })
                             }else{

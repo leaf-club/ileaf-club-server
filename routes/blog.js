@@ -140,18 +140,14 @@ router.post('/saveBlog', function (req, res, next) {
 
 //获取博客列表
 router.get('/getBlogList', function (req, res, next) {
+    let userId = req.param('userId');
     let pageIndex = +req.param('pageIndex');
     let pageSize = +req.param('pageSize');
     let skip = (pageIndex - 1) * pageSize;   //分页参数
 
     //删选的时候要选出blogStatus为1的已发布的博文
-    Blog.fingBlogList(skip, pageSize, function (err, docs) {
-        if (err) {
-            res.json({
-                status: '3201',
-                message: err.message
-            })
-        } else {
+    Blog.findBlogList(skip,pageSize).then(function(docs){
+        if(userId){
             FavouriteList.find({ userId: userId, type: 0 }).then(function (favouriteDocs) {
                 LikeList.find({ userId: userId, type: 0 }).then(function (likeDocs) {
                     docs.forEach(item => {
@@ -176,6 +172,16 @@ router.get('/getBlogList', function (req, res, next) {
                         }
                     })
                 })
+            })
+        }else{
+            res.json({
+                result: {
+                    status: '200',
+                    message: 'success'
+                },
+                data: {
+                    blogList: docs
+                }
             })
         }
     })
@@ -412,6 +418,43 @@ router.get('/getCommentList', function (req, res, next) {
         }
     })
 });
+
+//给评论点赞
+router.post('/likeCommet',function(req,res,next){
+    var commentId = req.body.commentId;
+    BlogCommentList.findOne({_id:commentId},function(err,doc){
+        if(err){
+            res.json({
+                result:{
+                    status: '302',
+                    message: err.message
+                }
+            })
+        }else{
+            doc.likeNum++;
+            doc.save(function(err,newDoc){
+                if(err){
+                    res.json({
+                        result:{
+                            status: '302',
+                            message: err.message
+                        }
+                    })
+                }else{
+                    res.json({
+                        result:{
+                            status: '200',
+                            message:'success'
+                        },
+                        data:{
+                            likeNum: newDoc.likeNum
+                        }
+                    })
+                }
+            })
+        }
+    })
+})
 
 module.exports = router;
 

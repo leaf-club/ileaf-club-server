@@ -51,6 +51,7 @@ router.post('/saveWork',function(req,res,next){
 
 //获取作品列表
 router.get('/getWorkList',function(req,res,next){
+    let userId = req.param('userId');
     let pageIndex = +req.param('pageIndex');
     let pageSize = +req.param('pageSize');
     let skip = (pageIndex-1)*pageSize;   //分页参数
@@ -62,31 +63,43 @@ router.get('/getWorkList',function(req,res,next){
                 message: err.message
             })
         } else {
-            FavouriteList.find({ userId: userId, type: 1 }).then(function (favouriteDocs) {
-                LikeList.find({ userId: userId, type: 1 }).then(function (likeDocs) {
-                    docs.forEach(item => {
-                        favouriteDocs.forEach(item1 => {
-                            if (item._id == item1) {
-                                docs.favorited = true;
-                            }
+            if(userId){
+                FavouriteList.find({ userId: userId, type: 1 }).then(function (favouriteDocs) {
+                    LikeList.find({ userId: userId, type: 1 }).then(function (likeDocs) {
+                        docs.forEach(item => {
+                            favouriteDocs.forEach(item1 => {
+                                if (item._id == item1) {
+                                    docs.favorited = true;
+                                }
+                            });
+                            likeDocs.forEach(item2 => {
+                                if (item._id == item2) {
+                                    docs.liked = true;
+                                }
+                            });
                         });
-                        likeDocs.forEach(item2 => {
-                            if (item._id == item2) {
-                                docs.liked = true;
+                        res.json({
+                            result: {
+                                status: '200',
+                                message: 'success'
+                            },
+                            data: {
+                                workList: docs
                             }
-                        });
-                    });
-                    res.json({
-                        result: {
-                            status: '200',
-                            message: 'success'
-                        },
-                        data: {
-                            workList: docs
-                        }
+                        })
                     })
                 })
-            })
+            }else{
+                res.json({
+                    result: {
+                        status: '200',
+                        message: 'success'
+                    },
+                    data: {
+                        workList: docs
+                    }
+                })
+            } 
         }
     })
 })
