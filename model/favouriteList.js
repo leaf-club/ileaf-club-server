@@ -19,16 +19,14 @@ favouriteListSchema.statics = {
         return this
             .find({userId:userId,type:0})
             .sort({createTime:-1})
-            .populate({path:'userInfo',select:'userName avatar contact _id'})
-            .populate("blogId")
+            .populate({path:"blogId",populate:{path:"userInfo",select:'userName avatar contact _id'}})
             .exec(callback)
             },
     findfavouriteWorks: function(userId,callback){
         return this
             .find({userId:userId,type:1})
             .sort({createTime:-1})
-            .populate({path:'userInfo',select:'userName avatar contact _id'})
-            .populate("workId")
+            .populate({path:"workId",populate:{path:"userInfo",select:'userName avatar contact _id'}})
             .exec(callback)
             }
 }

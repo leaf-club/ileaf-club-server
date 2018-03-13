@@ -312,8 +312,8 @@ router.get('/getFavouriteList',function(req,res,next){
                                 message:'success'
                             },    
                             data: {
-                                favoriteBlogList: doc,
-                                favoriteWorkList: doc1
+                                favoriteBlogList: doc.blogId,
+                                favoriteWorkList: doc1.workId
                             }
                         })
                 }
@@ -349,8 +349,8 @@ router.get('/getLikeList',function(req,res,next){
                                 message:'success'
                             },    
                             data: {
-                                likeBlogList: doc,
-                                likeWorkList: doc1
+                                likeBlogList: doc.blogId,
+                                likeWorkList: doc1.workId
                             }
                         })
                 }
