@@ -65,12 +65,12 @@ router.get('/getWorkList',function(req,res,next){
                     docs.forEach(item => {
                         favouriteDocs.forEach(item1 => {
                             if (item._id == item1) {
-                                docs.favorited = true;
+                                item.favorited = true;
                             }
                         });
                         likeDocs.forEach(item2 => {
                             if (item._id == item2) {
-                                docs.liked = true;
+                                item.liked = true;
                             }
                         });
                     });
@@ -113,12 +113,12 @@ router.get('/getRecommendWorkList',function(req,res,next){
                     docs.forEach(item=>{
                         favouriteDocs.forEach(item1=>{
                             if(item._id==item1){
-                                docs.favorited = true;
+                                item.favorited = true;
                             }
                         });
                         likeDocs.forEach(item2=>{
                             if(item._id==item2){
-                                docs.liked = true;
+                                item.liked = true;
                             }
                         });
                     });
