@@ -7,7 +7,7 @@ autoIncrement.initialize(connection);
 
 var blogSchema = new Schema({
             "userInfo":{type:Number, ref:'User'},
-            "createTime":{type:Number,default:Date.now()},
+            "createTime":Number,
             "title":String,
             "abstract":String,
             "htmlCode":String,
@@ -22,7 +22,7 @@ var blogSchema = new Schema({
             "likeNum":{type:Number,default:0},
             "favoriteNum":{type:Number,default:0},
             "readNum":{type:Number,default:0},
-            "updateTime":{type:Number,default:Date.now()},
+            "updateTime":Number,
             "extra":String,
         });
 

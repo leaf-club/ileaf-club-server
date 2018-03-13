@@ -16,6 +16,7 @@ router.post('/saveWork',function(req,res,next){
         title = req.body.title,
         description = req.body.description;
         cover = req.body.cover;
+        createTime = Date.now();
         //workTypeName = req.body.workTypeName,
         //workTypeId = req.body.workTypeId;
 
@@ -25,6 +26,7 @@ router.post('/saveWork',function(req,res,next){
             title:title,
             description:description,
             cover:cover,
+            createTime:createTime,
         });
 
         work.save(function(err,doc){
@@ -56,51 +58,44 @@ router.get('/getWorkList',function(req,res,next){
     let pageSize = +req.param('pageSize');
     let skip = (pageIndex-1)*pageSize;   //分页参数
     
-    Work.fingWorkList(skip, pageSize, function (err, docs) {
-        if (err) {
-            res.json({
-                status: '3201',
-                message: err.message
-            })
-        } else {
-            if(userId){
-                FavouriteList.find({ userId: userId, type: 1 }).then(function (favouriteDocs) {
-                    LikeList.find({ userId: userId, type: 1 }).then(function (likeDocs) {
-                        docs.forEach(item => {
-                            favouriteDocs.forEach(item1 => {
-                                if (item._id == item1) {
-                                    docs.favorited = true;
-                                }
-                            });
-                            likeDocs.forEach(item2 => {
-                                if (item._id == item2) {
-                                    docs.liked = true;
-                                }
-                            });
-                        });
-                        res.json({
-                            result: {
-                                status: '200',
-                                message: 'success'
-                            },
-                            data: {
-                                workList: docs
+    Work.findWorkList(skip, pageSize).then(function(docs){
+        if(userId){
+            FavouriteList.find({ userId: userId, type: 1 }).then(function (favouriteDocs) {
+                LikeList.find({ userId: userId, type: 1 }).then(function (likeDocs) {
+                    docs.forEach(item => {
+                        favouriteDocs.forEach(item1 => {
+                            if (item._id == item1) {
+                                docs.favorited = true;
                             }
-                        })
+                        });
+                        likeDocs.forEach(item2 => {
+                            if (item._id == item2) {
+                                docs.liked = true;
+                            }
+                        });
+                    });
+                    res.json({
+                        result: {
+                            status: '200',
+                            message: 'success'
+                        },
+                        data: {
+                            workList: docs
+                        }
                     })
                 })
-            }else{
-                res.json({
-                    result: {
-                        status: '200',
-                        message: 'success'
-                    },
-                    data: {
-                        workList: docs
-                    }
-                })
-            } 
-        }
+            })
+        }else{
+            res.json({
+                result: {
+                    status: '200',
+                    message: 'success'
+                },
+                data: {
+                    workList: docs
+                }
+            })
+        } 
     })
 })
 

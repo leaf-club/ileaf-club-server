@@ -36,6 +36,8 @@ router.post('/saveBlog', function (req, res, next) {
             typeId: typeId,
             status: status,
             typeName: typeName,
+            createTime: timeNow,
+            updateTime: timeNow,
         });
         blog.save(function (err, doc1) {
             if (status == 0) {

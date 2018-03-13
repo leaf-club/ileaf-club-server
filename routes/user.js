@@ -28,6 +28,7 @@ router.post('/register',function(req,res,next){
         var userName = req.body.userName;
         var password = req.body.password;
         var contact = req.body.contact;
+        var createTime = Date.now();
         var avatar = 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1520856372350&di=16e737ec8db51023769db892e5b059a8&imgtype=0&src=http%3A%2F%2Fp1.gexing.com%2Fshaitu%2F20121005%2F1117%2F506e513777326.jpg'
         var newUser = new User();
 
@@ -36,6 +37,7 @@ router.post('/register',function(req,res,next){
         newUser.password = password;
         newUser.contact = contact;
         newUser.avatar = avatar;
+        newUser.registeredTime = createTime;
     
         newUser.save(function(err,doc){
         if(err){
