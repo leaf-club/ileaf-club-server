@@ -137,7 +137,7 @@ router.post('/logout', function (req, res, next) {
 //检查是否登录
 router.get('/checkLogin', function (req, res, next) {
     if (req.cookies.userId) {
-        User.findOne({ _id: userId }, function (err, userDoc) {
+        User.findOne({ _id: req.cookies.userId }, function (err, userDoc) {
             if (err) {
                 res.json({
                     result: {
