@@ -253,15 +253,47 @@ router.get('/getBlogList', function (req, res, next) {
                 message: err.message
             })
         } else {
-            res.json({
-                result: {
-                    status: '200',
-                    message: '博客列表获取成功'
-                },
-                data: {
-                    blogList: doc
+            FavouriteList.find({userId:userId},function(err,doc1){
+                if(err){
+                    res.json({
+                        status:'302',
+                        message:err.message
+                    })
+                }else{
+                    LikeList.find({userId:userId},function(err,doc2){
+                        if(err){
+                            res.json({
+                                status:'302',
+                                message:err.message
+                            })
+                        }else{
+                            doc.forEach(item=>{
+                                doc1.forEach(item1=>{
+                                    if(item._id==item1.blogId){
+                                        item.favorited = true;
+                                    }
+                                })
+                            });
+                            doc.forEach(item=>{
+                                doc2.forEach(item1=>{
+                                    if(item._id==item1.blogId){
+                                        item.liked = true;
+                                    }
+                                })
+                            });
+                            res.json({
+                                result: {
+                                    status: '200',
+                                    message: '博客列表获取成功'
+                                },
+                                data: {
+                                    blogList: doc
+                                }
+                            })
+                        }
+                    });   
                 }
-            })
+            }) 
         }
     })
 })
@@ -284,13 +316,45 @@ router.get('/getWorkList', function (req, res, next) {
                 }
             })
         } else {
-            res.json({
-                result: {
-                    status: '200',
-                    message: 'success'
-                },
-                data: {
-                    workList: doc
+            FavouriteList.find({userId:userId},function(err,doc1){
+                if(err){
+                    res.json({
+                        status:'302',
+                        message:err.message
+                    })
+                }else{
+                    LikeList.find({userId:userId},function(err,doc2){
+                        if(err){
+                            res.json({
+                                status:'302',
+                                message:err.message
+                            })
+                        }else{
+                            doc.forEach(item=>{
+                                doc1.forEach(item1=>{
+                                    if(item._id==item1.workId){
+                                        item.favorited = true;
+                                    }
+                                })
+                            });
+                            doc.forEach(item=>{
+                                doc2.forEach(item1=>{
+                                    if(item._id==item1.workId){
+                                        item.liked = true;
+                                    }
+                                })
+                            });
+                            res.json({
+                                result: {
+                                    status: '200',
+                                    message: '博客列表获取成功'
+                                },
+                                data: {
+                                    workList: doc
+                                }
+                            })
+                        }  
+                    });   
                 }
             })
         }
