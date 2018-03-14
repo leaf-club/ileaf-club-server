@@ -64,12 +64,12 @@ router.get('/getWorkList',function(req,res,next){
                 LikeList.find({ userId: userId, type: 1 }).then(function (likeDocs) {
                     docs.forEach(item => {
                         favouriteDocs.forEach(item1 => {
-                            if (item._id == item1) {
+                            if (item._id == item1.workId) {
                                 item.favorited = true;
                             }
                         });
                         likeDocs.forEach(item2 => {
-                            if (item._id == item2) {
+                            if (item._id == item2.workId) {
                                 item.liked = true;
                             }
                         });
@@ -112,12 +112,12 @@ router.get('/getRecommendWorkList',function(req,res,next){
                 LikeList.find({userId:userId,type:1}).then(function(likeDocs){
                     docs.forEach(item=>{
                         favouriteDocs.forEach(item1=>{
-                            if(item._id==item1){
+                            if(item._id==item1.workId){
                                 item.favorited = true;
                             }
                         });
                         likeDocs.forEach(item2=>{
-                            if(item._id==item2){
+                            if(item._id==item2.workId){
                                 item.liked = true;
                             }
                         });

@@ -154,12 +154,12 @@ router.get('/getBlogList', function (req, res, next) {
                 LikeList.find({ userId: userId, type: 0 }).then(function (likeDocs) {
                     docs.forEach(item => {
                         favouriteDocs.forEach(item1 => {
-                            if (item._id == item1) {
+                            if (item._id == item1.blogId) {
                                 item.favorited = true;
                             }
                         });
                         likeDocs.forEach(item2 => {
-                            if (item._id == item2) {
+                            if (item._id == item2.blogId) {
                                 item.liked = true;
                             }
                         });
@@ -202,12 +202,12 @@ router.get('/getRecommendBlogList', function (req, res, next) {
                     LikeList.find({ userId: userId, type: 0 }).then(function (likeDocs) {
                         docs.forEach(item => {
                             favouriteDocs.forEach(item1 => {
-                                if (item._id == item1) {
+                                if (item._id == item1.blogId) {
                                     item.favorited = true;
                                 }
                             });
                             likeDocs.forEach(item2 => {
-                                if (item._id == item2) {
+                                if (item._id == item2.blogId) {
                                     item.liked = true;
                                 }
                             });
