@@ -24,15 +24,17 @@ app.set('view engine', 'html');
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
-app.use(cors());  //允许所有的请求跨域，具体复杂应用可以看文档
+app.use(cors({
+    origin:"http://localhost:3000"
+}));  //允许所有的请求跨域，具体复杂应用可以看文档
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(session({
   secret: 'keyboard cat',
-  resave: false,
-  saveUninitialized: true,
+  resave: true,
+  saveUninitialized: false,
   cookie: { secure: true, maxAge: 60000}
 }));
 app.use(express.static(path.join(__dirname, 'public')));

@@ -83,16 +83,16 @@ router.post('/login',function(req,res,next){
         }else{
             if(doc){
                 //验证成功后，把信息添加到cookie中
-                // res.cookie("userId",doc._id,{
-                //     path:'/',
-                //     maxAge:1000*60*60
-                //   });
+                res.cookie("userId",doc._id,{
+                    path:'/',
+                    maxAge:1000*60*60
+                  });
       
-                // res.cookie("userName",doc.userName,{
-                //     path:'/',
-                //     maxAge:1000*60*60
-                //   });
-                req.session.userId = doc._id;
+                res.cookie("userName",doc.userName,{
+                    path:'/',
+                    maxAge:1000*60*60
+                  });
+                // req.session.userId = doc._id;
 
                 res.json({
                     result:{
@@ -310,9 +310,15 @@ router.get('/getFavouriteList',function(req,res,next){
                         var favouriteBlogList = [];
                         var favouriteWorkList = [];
                         doc.forEach(item=>{
+                            if(item.userId==userId){
+                                item.blogId.liked = true;
+                            }
                             favouriteBlogList.push(item.blogId);
                         });
                         doc1.forEach(item=>{
+                            if(item.userId==userId){
+                                item.workId.liked = true;
+                            }
                             favouriteWorkList.push(item.workId);
                         });
                         res.json({
@@ -355,9 +361,15 @@ router.get('/getLikeList',function(req,res,next){
                         var likeBlogList = [];
                         var likeWorkList = [];
                         doc.forEach(item=>{
+                            if(item.userId==userId){
+                                item.blogId.liked = true;
+                            }
                             likeBlogList.push(item.blogId);
                         });
                         doc1.forEach(item=>{
+                            if(item.userId==userId){
+                                item.workId.liked = true;
+                            }
                             likeWorkList.push(item.workId);
                         });
                         res.json({
