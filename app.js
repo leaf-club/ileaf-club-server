@@ -25,7 +25,8 @@ app.set('view engine', 'html');
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(cors({
-    origin:"http://localhost:3000"
+    origin:"http://localhost:8080",
+    credentials:true
 }));  //允许所有的请求跨域，具体复杂应用可以看文档
 app.use(logger('dev'));
 app.use(bodyParser.json());
