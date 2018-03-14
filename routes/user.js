@@ -322,13 +322,13 @@ router.get('/getFavouriteList', function (req, res, next) {
                     var favouriteWorkList = [];
                     doc.forEach(item => {
                         if (item.userId == userId) {
-                            item.blogId.liked = true;
+                            item.blogId.favorited = true;
                         }
                         favouriteBlogList.push(item.blogId);
                     });
                     doc1.forEach(item => {
                         if (item.userId == userId) {
-                            item.workId.liked = true;
+                            item.workId.favorited = true;
                         }
                         favouriteWorkList.push(item.workId);
                     });
@@ -422,7 +422,7 @@ router.get('/getDraft', function (req, res, next) {
                     message: '草稿列表获取成功'
                 },
                 data: {
-                    blogList: doc
+                    draftList: doc
                 }
             })
         }
