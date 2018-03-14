@@ -148,8 +148,8 @@ router.get('/getBlogList', function (req, res, next) {
     let skip = (pageIndex - 1) * pageSize;   //分页参数
 
     //删选的时候要选出blogStatus为1的已发布的博文
-    Blog.findBlogList(skip,pageSize).then(function(docs){
-        if(userId){
+    Blog.findBlogList(skip, pageSize).then(function (docs) {
+        if (userId) {
             FavouriteList.find({ userId: userId, type: 0 }).then(function (favouriteDocs) {
                 LikeList.find({ userId: userId, type: 0 }).then(function (likeDocs) {
                     docs.forEach(item => {
@@ -175,7 +175,7 @@ router.get('/getBlogList', function (req, res, next) {
                     })
                 })
             })
-        }else{
+        } else {
             res.json({
                 result: {
                     status: '200',
@@ -240,6 +240,7 @@ router.get('/getRecommendBlogList', function (req, res, next) {
 
 //获取博客详情，需要把阅读的数量+1
 router.get('/getBlogDetail', function (req, res, next) {
+    var userId = req.cookies.userId;
     var _id = req.param('id');
     Blog.findOne({ _id: _id }, function (err, doc) {
         if (err) {
@@ -254,7 +255,7 @@ router.get('/getBlogDetail', function (req, res, next) {
                 doc.readNum++;
                 doc.save()
                     .then(function (doc) {
-                        Blog.findBlogDetail(_id, function (err, doc2) {
+                        Blog.findBlogDetail(_id, function (err, doc1) {
                             if (err) {
                                 res.json({
                                     result: {
@@ -263,15 +264,55 @@ router.get('/getBlogDetail', function (req, res, next) {
                                     }
                                 })
                             } else {
-                                res.json({
-                                    result: {
-                                        status: '200',
-                                        message: 'success'
-                                    },
-                                    data: {
-                                        blogDetail: doc2
-                                    }
-                                })
+                                if(userId){
+                                    FavouriteList.find({ userId: userId }, function (err, doc2) {
+                                        if (err) {
+                                            res.json({
+                                                status: '302',
+                                                message: err.message
+                                            })
+                                        } else {
+                                            LikeList.find({ userId: userId }, function (err, doc3) {
+                                                if (err) {
+                                                    res.json({
+                                                        status: '302',
+                                                        message: err.message
+                                                    })
+                                                } else {
+                                                    doc2.forEach(item => {
+                                                        if(item.blogId==doc1._id){
+                                                            doc1.favorited = true;
+                                                        }
+                                                    });
+                                                    doc3.forEach(item => {    
+                                                            if (item._id == doc1._id) {
+                                                                doc1.liked = true;
+                                                            }                                                      
+                                                    });
+                                                }
+                                                res.json({
+                                                    result: {
+                                                        status: '200',
+                                                        message: '博客列表获取成功'
+                                                    },
+                                                    data: {
+                                                        blogDetail: doc1
+                                                    }
+                                                })
+                                            });
+                                        }
+                                    })
+                                }else{
+                                    res.json({
+                                        result: {
+                                            status: '200',
+                                            message: 'success'
+                                        },
+                                        data:{
+                                            blogDetail:doc1
+                                        }
+                                    })
+                                }
                             }
                         })
                     })
@@ -422,33 +463,33 @@ router.get('/getCommentList', function (req, res, next) {
 });
 
 //给评论点赞
-router.post('/likeCommet',function(req,res,next){
+router.post('/likeCommet', function (req, res, next) {
     var commentId = req.body.commentId;
-    BlogCommentList.findOne({_id:commentId},function(err,doc){
-        if(err){
+    BlogCommentList.findOne({ _id: commentId }, function (err, doc) {
+        if (err) {
             res.json({
-                result:{
+                result: {
                     status: '302',
                     message: err.message
                 }
             })
-        }else{
+        } else {
             doc.likeNum++;
-            doc.save(function(err,newDoc){
-                if(err){
+            doc.save(function (err, newDoc) {
+                if (err) {
                     res.json({
-                        result:{
+                        result: {
                             status: '302',
                             message: err.message
                         }
                     })
-                }else{
+                } else {
                     res.json({
-                        result:{
+                        result: {
                             status: '200',
-                            message:'success'
+                            message: 'success'
                         },
-                        data:{
+                        data: {
                             likeNum: newDoc.likeNum
                         }
                     })
