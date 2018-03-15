@@ -382,28 +382,54 @@ router.get('/getFavouriteList', function (req, res, next) {
                         }
                     })
                 } else {
-                    var favouriteBlogList = [];
-                    var favouriteWorkList = [];
-                    doc.forEach(item => {
-                        if (item.userId == userId) {
-                            item.blogId.favorited = true;
-                        }
-                        favouriteBlogList.push(item.blogId);
-                    });
-                    doc1.forEach(item => {
-                        if (item.userId == userId) {
-                            item.workId.favorited = true;
-                        }
-                        favouriteWorkList.push(item.workId);
-                    });
-                    res.json({
-                        result: {
-                            status: '200',
-                            message: 'success'
-                        },
-                        data: {
-                            favouriteBlogList: favouriteBlogList,
-                            favouriteWorkList: favouriteWorkList
+                    LikeList.findLikeList(userId,function(err,doc2){
+                        if(err){
+                            res.json({
+                                result: {
+                                    status: '302',
+                                    message: err.message
+                                }
+                            })
+                        }else{
+                            var favouriteBlogList = [];
+                            var favouriteWorkList = [];
+                            doc.forEach(item => {
+                                if (item.userId == userId) {
+                                    item.blogId.favorited = true;
+                                }
+                                doc2.forEach(item1=>{
+                                    if(item.blogId._id==item1.blogId._id){
+                                        item.blogId.liked = true;
+                                    }
+                                })
+                                favouriteBlogList.push(item.blogId);                      
+                            });                           
+                            doc1.forEach(item => {
+                                if (item.userId == userId) {
+                                    item.workId.favorited = true;
+                                }
+                                doc2.forEach(item1=>{
+                                    if(item.workId._id==item1.workId._id){
+                                        item.workId.liked = true;
+                                    }
+                                })
+                                favouriteWorkList.push(item.workId);
+                            });
+                            // doc1.forEach(item=>{
+                            //     if(item.workId==doc2.workId){
+                            //         item.workId.liked = true;
+                            //     }
+                            // })
+                            res.json({
+                                result: {
+                                    status: '200',
+                                    message: 'success'
+                                },
+                                data: {
+                                    favouriteBlogList: favouriteBlogList,
+                                    favouriteWorkList: favouriteWorkList
+                                }
+                            })
                         }
                     })
                 }
@@ -433,30 +459,51 @@ router.get('/getLikeList', function (req, res, next) {
                         }
                     })
                 } else {
-                    var likeBlogList = [];
-                    var likeWorkList = [];
-                    doc.forEach(item => {
-                        if (item.userId == userId) {
-                            item.blogId.liked = true;
+                    FavouriteList.findFavouriteList(userId,function(err,doc2){
+                        if(err){
+                            res.json({
+                                result: {
+                                    status: '302',
+                                    message: err.message
+                                }
+                            })
+                        }else{
+                            var likeBlogList = [];
+                            var likeWorkList = [];
+                            doc.forEach(item => {
+                                if (item.userId == userId) {
+                                    item.blogId.liked = true;
+                                }
+                                doc2.forEach(item1=>{
+                                    if(item.blogId._id==item1.blogId._id){
+                                        item.blogId.favorited = true;
+                                    }
+                                })
+                                likeBlogList.push(item.blogId);
+                            });
+                            doc1.forEach(item => {
+                                if (item.userId == userId) {
+                                    item.workId.liked = true;
+                                }
+                                doc2.forEach(item1=>{
+                                    if(item.workId._id==item1.workId._id){
+                                        item.workId.favorited = true;
+                                    }
+                                })
+                                likeWorkList.push(item.workId);
+                            });
+                            res.json({
+                                result: {
+                                    status: '200',
+                                    message: 'success'
+                                },
+                                data: {
+                                    likeBlogList: likeBlogList,
+                                    likeWorkList: likeWorkList
+                                }
+                            })
                         }
-                        likeBlogList.push(item.blogId);
-                    });
-                    doc1.forEach(item => {
-                        if (item.userId == userId) {
-                            item.workId.liked = true;
-                        }
-                        likeWorkList.push(item.workId);
-                    });
-                    res.json({
-                        result: {
-                            status: '200',
-                            message: 'success'
-                        },
-                        data: {
-                            likeBlogList: likeBlogList,
-                            likeWorkList: likeWorkList
-                        }
-                    })
+                    })                   
                 }
             })
         }

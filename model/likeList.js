@@ -28,7 +28,14 @@ likeListSchema.statics = {
             .sort({createTime:-1})
             .populate({path:"workId",populate:{path:"userInfo",select:'userName avatar contact _id'}})
             .exec(callback)
-            }
+            },
+    findLikeList: function(userId,callback){
+        return this
+            .find({userId:userId})
+            .populate({path:"blogId",populate:{path:"userInfo",select:'userName avatar contact _id'}})
+            .populate({path:"workId",populate:{path:"userInfo",select:'userName avatar contact _id'}})
+            .exec(callback)
+    }
 }
 
 likeListSchema.plugin(autoIncrement.plugin, 'LikeList');

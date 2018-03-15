@@ -142,7 +142,7 @@ router.post('/saveBlog', function (req, res, next) {
 
 //获取博客列表
 router.get('/getBlogList', function (req, res, next) {
-    let userId = req.param('userId');
+    let userId = req.cookies.userId;
     let pageIndex = +req.param('pageIndex');
     let pageSize = +req.param('pageSize');
     let skip = (pageIndex - 1) * pageSize;   //分页参数
@@ -191,8 +191,7 @@ router.get('/getBlogList', function (req, res, next) {
 
 //获取推荐博客
 router.get('/getRecommendBlogList', function (req, res, next) {
-    //let userId = req.cookies.userId;
-    let userId = req.param("userId");
+    let userId = req.cookies.userId;
     let count = +req.param('count');
     Blog.findBlogs(count)
         .then(function (docs) {
@@ -289,16 +288,16 @@ router.get('/getBlogDetail', function (req, res, next) {
                                                                 doc1.liked = true;
                                                             }                                                      
                                                     });
-                                                }
-                                                res.json({
-                                                    result: {
-                                                        status: '200',
-                                                        message: '博客列表获取成功'
-                                                    },
-                                                    data: {
-                                                        blogDetail: doc1
-                                                    }
-                                                })
+                                                    res.json({
+                                                        result: {
+                                                            status: '200',
+                                                            message: '博客列表获取成功'
+                                                        },
+                                                        data: {
+                                                            blogDetail: doc1
+                                                        }
+                                                    })
+                                                }    
                                             });
                                         }
                                     })

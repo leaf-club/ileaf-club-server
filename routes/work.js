@@ -53,7 +53,7 @@ router.post('/saveWork',function(req,res,next){
 
 //获取作品列表
 router.get('/getWorkList',function(req,res,next){
-    let userId = req.param('userId');
+    let userId = req.cookies.userId;
     let pageIndex = +req.param('pageIndex');
     let pageSize = +req.param('pageSize');
     let skip = (pageIndex-1)*pageSize;   //分页参数
