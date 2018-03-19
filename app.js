@@ -33,9 +33,10 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(session({
-  secret: 'keyboard cat',
+  secret: 'keyboardcat',
+  name: 'contact',
   resave: true,
-  saveUninitialized: false,
+  saveUninitialized: true,
   cookie: { secure: true, maxAge: 60000}
 }));
 app.use(express.static(path.join(__dirname, 'public')));

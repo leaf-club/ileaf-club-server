@@ -1,11 +1,16 @@
 var express = require('express');
 var router = express.Router();
 var mongoose = require('mongoose');
+var redis = require('redis');
 var User = require('./../model/user');
 var Blog = require('./../model/blog');
 var Work = require('./../model/work');
 var FavouriteList = require('./../model/favouriteList');
 var LikeList = require('./../model/likeList');
+var sendEmail = require('./../util/email');
+var getRandomNumber = require('./../util/randomNumber');
+
+var redisClient = redis.createClient({host:'192.168.2.70'});
 
 
 mongoose.connect('mongodb://127.0.0.1:27017/leafclub');
@@ -22,12 +27,38 @@ mongoose.connection.on("disconnected", function () {
     console.log("MongoDB disconnected.")
 });
 
+//获取验证码
+router.post('/getValidationCode',function(req,res,next){
+    var email = req.body.email;
+    var number = getRandomNumber();
+    sendEmail(email,number);
+    redisClient.set(email,number,function(err,reply){
+        if(err){
+            res.json({
+                result:{
+                    status:'302',
+                    message:err.message
+                }
+            })
+        }else{
+            redisClient.expire("ValidationCode",24*60*60);
+            res.json({
+                result: {
+                    status: '200',
+                    message: '验证码已发送'
+                }
+            })
+        }
+    });  
+})
+
 //手动添加一个用户
 router.post('/register', function (req, res, next) {
     //var userId = 1;
     var userName = req.body.userName;
     var password = req.body.password;
     var contact = req.body.contact;
+    var validateNumber = req.body.number;
     var createTime = Date.now();
     var avatar = 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1520856372350&di=16e737ec8db51023769db892e5b059a8&imgtype=0&src=http%3A%2F%2Fp1.gexing.com%2Fshaitu%2F20121005%2F1117%2F506e513777326.jpg'
     var newUser = new User();
@@ -39,32 +70,50 @@ router.post('/register', function (req, res, next) {
     newUser.avatar = avatar;
     newUser.registeredTime = createTime;
 
-    newUser.save(function (err, doc) {
-        if (err) {
+    // var num = getRandomNumber();
+    // console.log(req.session);
+    // req.session.contact = num;
+    // console.log(req.session);
+    // sendEmail(contact,num);
+    redisClient.get(contact,function(err,value){
+        var redisValidateNumber = value;
+        if(validateNumber==redisValidateNumber){
+            newUser.save(function (err, doc) {
+                if (err) {
+                    res.json({
+                        result: {
+                            status: '304',
+                            message: err.message
+                        }
+                    })
+                } else {         
+                    res.json({
+                        result: {
+                            status: '200',
+                            message: 'success'
+                        },
+                        data: {
+                            userInfo: {
+                                userId: doc._id,
+                                userName: doc.userName,
+                                avatar: doc.avatar,
+                                contact: doc.contact
+                            }
+                        }
+                    })
+                }
+            });
+        }else{
             res.json({
-                result: {
-                    status: '304',
-                    message: err.message
+                result:{
+                    status:'302',
+                    message:'验证码不正确'
                 }
             })
-        } else {
-            res.json({
-                result: {
-                    status: '200',
-                    message: 'success'
-                },
-                data: {
-                    userInfo: {
-                        userId: doc._id,
-                        userName: doc.userName,
-                        avatar: doc.avatar,
-                        contact: doc.contact
-                    }
-                }
-            })
-        }
-    });
+        }  
+    });   
 });
+
 
 //登录验证
 router.post('/login', function (req, res, next) {
@@ -72,6 +121,9 @@ router.post('/login', function (req, res, next) {
         contact: req.body.contact,
         password: req.body.password
     }
+    // console.log(req.session);
+    // var num = req.session.contact;
+    // console.log("2"+num);
     User.findOne(param, function (err, doc) {
         if (err) {
             res.json({
@@ -93,7 +145,7 @@ router.post('/login', function (req, res, next) {
                     maxAge: 1000 * 60 * 60
                 });
                 // req.session.userId = doc._id;
-
+                
                 res.json({
                     result: {
                         status: "200",
@@ -209,11 +261,11 @@ router.get('/getUserInfo', function (req, res, next) {
 //获取文章数，作品数，收藏数，点赞数，草稿数
 router.get('/getCounts', function (req, res, next) {
     var userId = req.param("userId");
-    Blog.find({ userId: userId, status: 1 }).then(function (blogDoc) {
-        Work.find({ userId: userId }).then(function (workDoc) {
+    Blog.find({ userInfo: userId, status: 1 }).then(function (blogDoc) {
+        Work.find({ userInfo: userId }).then(function (workDoc) {
             FavouriteList.find({ userId: userId }).then(function (FavouriteList) {
                 LikeList.find({ userId: userId }).then(function (LikeList) {
-                    Blog.find({ userId: userId, status: 1 }).then(function (draftDoc) {
+                    Blog.find({ userId: userId, status: 0 }).then(function (draftDoc) {
                         res.json({
                             result: {
                                 status: '200',
@@ -234,9 +286,9 @@ router.get('/getCounts', function (req, res, next) {
     })
 })
 
-//获取个人博客列表
+//获取个人博客列表(需要传userId)
 router.get('/getBlogList', function (req, res, next) {
-    //let userId = req.cookies.userId;
+    // let userId = req.cookies.userId;
     let userId = req.param('userId');
     let pageIndex = +req.param('pageIndex');
     let pageSize = +req.param('pageSize');
@@ -300,7 +352,7 @@ router.get('/getBlogList', function (req, res, next) {
 
 //获取个人作品列表
 router.get('/getWorkList', function (req, res, next) {
-    //let userId = req.cookies.userId;
+    // let userId = req.cookies.userId;
     let userId = req.param('userId');
     let pageIndex = +req.param('pageIndex');
     let pageSize = +req.param('pageSize');
@@ -363,7 +415,8 @@ router.get('/getWorkList', function (req, res, next) {
 
 //获取收藏列表
 router.get('/getFavouriteList', function (req, res, next) {
-    var userId = +req.param("userId");
+    // let userId = req.cookies.userId;
+    let userId = req.param('userId');
     FavouriteList.findFavouriteBlogs(userId, function (err, doc) {
         if (err) {
             res.json({
@@ -382,28 +435,54 @@ router.get('/getFavouriteList', function (req, res, next) {
                         }
                     })
                 } else {
-                    var favouriteBlogList = [];
-                    var favouriteWorkList = [];
-                    doc.forEach(item => {
-                        if (item.userId == userId) {
-                            item.blogId.favorited = true;
-                        }
-                        favouriteBlogList.push(item.blogId);
-                    });
-                    doc1.forEach(item => {
-                        if (item.userId == userId) {
-                            item.workId.favorited = true;
-                        }
-                        favouriteWorkList.push(item.workId);
-                    });
-                    res.json({
-                        result: {
-                            status: '200',
-                            message: 'success'
-                        },
-                        data: {
-                            favouriteBlogList: favouriteBlogList,
-                            favouriteWorkList: favouriteWorkList
+                    LikeList.findLikeList(userId,function(err,doc2){
+                        if(err){
+                            res.json({
+                                result: {
+                                    status: '302',
+                                    message: err.message
+                                }
+                            })
+                        }else{
+                            var favouriteBlogList = [];
+                            var favouriteWorkList = [];
+                            doc.forEach(item => {
+                                if (item.userId == userId) {
+                                    item.blogId.favorited = true;
+                                }
+                                doc2.forEach(item1=>{
+                                    if(item.blogId._id==item1.blogId._id){
+                                        item.blogId.liked = true;
+                                    }
+                                })
+                                favouriteBlogList.push(item.blogId);                      
+                            });                           
+                            doc1.forEach(item => {
+                                if (item.userId == userId) {
+                                    item.workId.favorited = true;
+                                }
+                                doc2.forEach(item1=>{
+                                    if(item.workId._id==item1.workId._id){
+                                        item.workId.liked = true;
+                                    }
+                                })
+                                favouriteWorkList.push(item.workId);
+                            });
+                            // doc1.forEach(item=>{
+                            //     if(item.workId==doc2.workId){
+                            //         item.workId.liked = true;
+                            //     }
+                            // })
+                            res.json({
+                                result: {
+                                    status: '200',
+                                    message: 'success'
+                                },
+                                data: {
+                                    favouriteBlogList: favouriteBlogList,
+                                    favouriteWorkList: favouriteWorkList
+                                }
+                            })
                         }
                     })
                 }
@@ -414,7 +493,8 @@ router.get('/getFavouriteList', function (req, res, next) {
 
 //获取点赞列表
 router.get('/getLikeList', function (req, res, next) {
-    var userId = req.param('userId');
+    // let userId = req.cookies.userId;
+    let userId = req.param('userId');
     LikeList.findLikeBlogs(userId, function (err, doc) {
         if (err) {
             res.json({
@@ -433,30 +513,51 @@ router.get('/getLikeList', function (req, res, next) {
                         }
                     })
                 } else {
-                    var likeBlogList = [];
-                    var likeWorkList = [];
-                    doc.forEach(item => {
-                        if (item.userId == userId) {
-                            item.blogId.liked = true;
+                    FavouriteList.findFavouriteList(userId,function(err,doc2){
+                        if(err){
+                            res.json({
+                                result: {
+                                    status: '302',
+                                    message: err.message
+                                }
+                            })
+                        }else{
+                            var likeBlogList = [];
+                            var likeWorkList = [];
+                            doc.forEach(item => {
+                                if (item.userId == userId) {
+                                    item.blogId.liked = true;
+                                }
+                                doc2.forEach(item1=>{
+                                    if(item.blogId._id==item1.blogId._id){
+                                        item.blogId.favorited = true;
+                                    }
+                                })
+                                likeBlogList.push(item.blogId);
+                            });
+                            doc1.forEach(item => {
+                                if (item.userId == userId) {
+                                    item.workId.liked = true;
+                                }
+                                doc2.forEach(item1=>{
+                                    if(item.workId._id==item1.workId._id){
+                                        item.workId.favorited = true;
+                                    }
+                                })
+                                likeWorkList.push(item.workId);
+                            });
+                            res.json({
+                                result: {
+                                    status: '200',
+                                    message: 'success'
+                                },
+                                data: {
+                                    likeBlogList: likeBlogList,
+                                    likeWorkList: likeWorkList
+                                }
+                            })
                         }
-                        likeBlogList.push(item.blogId);
-                    });
-                    doc1.forEach(item => {
-                        if (item.userId == userId) {
-                            item.workId.liked = true;
-                        }
-                        likeWorkList.push(item.workId);
-                    });
-                    res.json({
-                        result: {
-                            status: '200',
-                            message: 'success'
-                        },
-                        data: {
-                            likeBlogList: likeBlogList,
-                            likeWorkList: likeWorkList
-                        }
-                    })
+                    })                   
                 }
             })
         }
@@ -465,7 +566,7 @@ router.get('/getLikeList', function (req, res, next) {
 
 //获取草稿列表
 router.get('/getDraft', function (req, res, next) {
-    let userId = req.param('userId');
+    let userId = req.cookies.userId;
     let pageIndex = +req.param('pageIndex');
     let pageSize = +req.param('pageSize');
     let skip = (pageIndex - 1) * pageSize;   //分页参数

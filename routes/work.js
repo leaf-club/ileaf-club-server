@@ -53,7 +53,7 @@ router.post('/saveWork',function(req,res,next){
 
 //获取作品列表
 router.get('/getWorkList',function(req,res,next){
-    let userId = req.param('userId');
+    let userId = req.cookies.userId;
     let pageIndex = +req.param('pageIndex');
     let pageSize = +req.param('pageSize');
     let skip = (pageIndex-1)*pageSize;   //分页参数
@@ -195,6 +195,7 @@ router.get('/getWorkDetail',function(req,res,next){
        }
     })
 })
+
 
 //作品点赞，需要把点赞量+1
 // router.post('/praiseWork',function(req,res,next){
