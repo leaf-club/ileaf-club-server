@@ -3,6 +3,7 @@ var router = express.Router();
 var mongoose = require('mongoose');
 var User = require('./../model/user');
 var Blog = require('./../model/blog');
+var Work = require('./../model/work');
 var FavouriteList = require('./../model/favouriteList');
 var LikeList = require('./../model/likeList');
 
@@ -262,6 +263,7 @@ router.post('/like',function(req,res,next){
             }else{
                 if(workDoc){
                     workDoc.likeNum++;
+                    console.log(workDoc.likeNum++);
                     workDoc.save().then(function(workDoc){
                         var likeWork = new LikeList();
                         likeWork.userId = userId;

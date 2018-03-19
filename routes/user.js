@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var mongoose = require('mongoose');
+var redis = require('redis');
 var User = require('./../model/user');
 var Blog = require('./../model/blog');
 var Work = require('./../model/work');
@@ -8,6 +9,8 @@ var FavouriteList = require('./../model/favouriteList');
 var LikeList = require('./../model/likeList');
 var sendEmail = require('./../util/email');
 var getRandomNumber = require('./../util/randomNumber');
+
+var redisClient = redis.createClient({host:'192.168.2.70'});
 
 
 mongoose.connect('mongodb://127.0.0.1:27017/leafclub');
@@ -24,12 +27,38 @@ mongoose.connection.on("disconnected", function () {
     console.log("MongoDB disconnected.")
 });
 
+//获取验证码
+router.post('/getValidationCode',function(req,res,next){
+    var email = req.body.email;
+    var number = getRandomNumber();
+    sendEmail(email,number);
+    redisClient.set(email,number,function(err,reply){
+        if(err){
+            res.json({
+                result:{
+                    status:'302',
+                    message:err.message
+                }
+            })
+        }else{
+            redisClient.expire("ValidationCode",24*60*60);
+            res.json({
+                result: {
+                    status: '200',
+                    message: '验证码已发送'
+                }
+            })
+        }
+    });  
+})
+
 //手动添加一个用户
 router.post('/register', function (req, res, next) {
     //var userId = 1;
     var userName = req.body.userName;
     var password = req.body.password;
     var contact = req.body.contact;
+    var validateNumber = req.body.number;
     var createTime = Date.now();
     var avatar = 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1520856372350&di=16e737ec8db51023769db892e5b059a8&imgtype=0&src=http%3A%2F%2Fp1.gexing.com%2Fshaitu%2F20121005%2F1117%2F506e513777326.jpg'
     var newUser = new User();
@@ -46,46 +75,44 @@ router.post('/register', function (req, res, next) {
     // req.session.contact = num;
     // console.log(req.session);
     // sendEmail(contact,num);
-
-    newUser.save(function (err, doc) {
-        if (err) {
+    redisClient.get(contact,function(err,value){
+        var redisValidateNumber = value;
+        if(validateNumber==redisValidateNumber){
+            newUser.save(function (err, doc) {
+                if (err) {
+                    res.json({
+                        result: {
+                            status: '304',
+                            message: err.message
+                        }
+                    })
+                } else {         
+                    res.json({
+                        result: {
+                            status: '200',
+                            message: 'success'
+                        },
+                        data: {
+                            userInfo: {
+                                userId: doc._id,
+                                userName: doc.userName,
+                                avatar: doc.avatar,
+                                contact: doc.contact
+                            }
+                        }
+                    })
+                }
+            });
+        }else{
             res.json({
-                result: {
-                    status: '304',
-                    message: err.message
+                result:{
+                    status:'302',
+                    message:'验证码不正确'
                 }
             })
-        } else {         
-            res.json({
-                result: {
-                    status: '200',
-                    message: 'success'
-                },
-                data: {
-                    userInfo: {
-                        userId: doc._id,
-                        userName: doc.userName,
-                        avatar: doc.avatar,
-                        contact: doc.contact
-                    }
-                }
-            })
-        }
-    });
+        }  
+    });   
 });
-
-router.post('/validationCode',function(req,res,next){
-    var email = req.body.email;
-    var contact = getRandomNumber();
-    req.session.contact = num;
-    sendEmail(email,num);
-    res.json({
-        result: {
-            status: '200',
-            message: '验证码已发送'
-        }
-    })
-})
 
 
 //登录验证
