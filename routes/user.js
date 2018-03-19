@@ -6,6 +6,8 @@ var Blog = require('./../model/blog');
 var Work = require('./../model/work');
 var FavouriteList = require('./../model/favouriteList');
 var LikeList = require('./../model/likeList');
+var sendEmail = require('./../util/email');
+var getRandomNumber = require('./../util/randomNumber');
 
 
 mongoose.connect('mongodb://127.0.0.1:27017/leafclub');
@@ -39,6 +41,12 @@ router.post('/register', function (req, res, next) {
     newUser.avatar = avatar;
     newUser.registeredTime = createTime;
 
+    // var num = getRandomNumber();
+    // console.log(req.session);
+    // req.session.contact = num;
+    // console.log(req.session);
+    // sendEmail(contact,num);
+
     newUser.save(function (err, doc) {
         if (err) {
             res.json({
@@ -47,7 +55,7 @@ router.post('/register', function (req, res, next) {
                     message: err.message
                 }
             })
-        } else {
+        } else {         
             res.json({
                 result: {
                     status: '200',
@@ -66,12 +74,29 @@ router.post('/register', function (req, res, next) {
     });
 });
 
+router.post('/validationCode',function(req,res,next){
+    var email = req.body.email;
+    var contact = getRandomNumber();
+    req.session.contact = num;
+    sendEmail(email,num);
+    res.json({
+        result: {
+            status: '200',
+            message: '验证码已发送'
+        }
+    })
+})
+
+
 //登录验证
 router.post('/login', function (req, res, next) {
     var param = {
         contact: req.body.contact,
         password: req.body.password
     }
+    // console.log(req.session);
+    // var num = req.session.contact;
+    // console.log("2"+num);
     User.findOne(param, function (err, doc) {
         if (err) {
             res.json({
@@ -93,7 +118,7 @@ router.post('/login', function (req, res, next) {
                     maxAge: 1000 * 60 * 60
                 });
                 // req.session.userId = doc._id;
-
+                
                 res.json({
                     result: {
                         status: "200",
@@ -209,11 +234,11 @@ router.get('/getUserInfo', function (req, res, next) {
 //获取文章数，作品数，收藏数，点赞数，草稿数
 router.get('/getCounts', function (req, res, next) {
     var userId = req.param("userId");
-    Blog.find({ userId: userId, status: 1 }).then(function (blogDoc) {
-        Work.find({ userId: userId }).then(function (workDoc) {
+    Blog.find({ userInfo: userId, status: 1 }).then(function (blogDoc) {
+        Work.find({ userInfo: userId }).then(function (workDoc) {
             FavouriteList.find({ userId: userId }).then(function (FavouriteList) {
                 LikeList.find({ userId: userId }).then(function (LikeList) {
-                    Blog.find({ userId: userId, status: 1 }).then(function (draftDoc) {
+                    Blog.find({ userId: userId, status: 0 }).then(function (draftDoc) {
                         res.json({
                             result: {
                                 status: '200',
@@ -234,9 +259,9 @@ router.get('/getCounts', function (req, res, next) {
     })
 })
 
-//获取个人博客列表
+//获取个人博客列表(需要传userId)
 router.get('/getBlogList', function (req, res, next) {
-    //let userId = req.cookies.userId;
+    // let userId = req.cookies.userId;
     let userId = req.param('userId');
     let pageIndex = +req.param('pageIndex');
     let pageSize = +req.param('pageSize');
@@ -300,8 +325,8 @@ router.get('/getBlogList', function (req, res, next) {
 
 //获取个人作品列表
 router.get('/getWorkList', function (req, res, next) {
-    //let userId = req.cookies.userId;
-    let userId = req.param('userId');
+    let userId = req.cookies.userId;
+    // let userId = req.param('userId');
     let pageIndex = +req.param('pageIndex');
     let pageSize = +req.param('pageSize');
     let skip = (pageIndex - 1) * pageSize;   //分页参数
@@ -363,7 +388,7 @@ router.get('/getWorkList', function (req, res, next) {
 
 //获取收藏列表
 router.get('/getFavouriteList', function (req, res, next) {
-    var userId = +req.param("userId");
+    let userId = req.cookies.userId;
     FavouriteList.findFavouriteBlogs(userId, function (err, doc) {
         if (err) {
             res.json({
@@ -440,7 +465,7 @@ router.get('/getFavouriteList', function (req, res, next) {
 
 //获取点赞列表
 router.get('/getLikeList', function (req, res, next) {
-    var userId = req.param('userId');
+    let userId = req.cookies.userId;
     LikeList.findLikeBlogs(userId, function (err, doc) {
         if (err) {
             res.json({
@@ -512,7 +537,7 @@ router.get('/getLikeList', function (req, res, next) {
 
 //获取草稿列表
 router.get('/getDraft', function (req, res, next) {
-    let userId = req.param('userId');
+    let userId = req.cookies.userId;
     let pageIndex = +req.param('pageIndex');
     let pageSize = +req.param('pageSize');
     let skip = (pageIndex - 1) * pageSize;   //分页参数

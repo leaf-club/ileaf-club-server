@@ -196,6 +196,7 @@ router.get('/getWorkDetail',function(req,res,next){
     })
 })
 
+
 //作品点赞，需要把点赞量+1
 // router.post('/praiseWork',function(req,res,next){
 //     var _id = req.body.id;
