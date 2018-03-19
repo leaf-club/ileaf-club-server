@@ -325,8 +325,8 @@ router.get('/getBlogList', function (req, res, next) {
 
 //获取个人作品列表
 router.get('/getWorkList', function (req, res, next) {
-    let userId = req.cookies.userId;
-    // let userId = req.param('userId');
+    // let userId = req.cookies.userId;
+    let userId = req.param('userId');
     let pageIndex = +req.param('pageIndex');
     let pageSize = +req.param('pageSize');
     let skip = (pageIndex - 1) * pageSize;   //分页参数
@@ -388,7 +388,8 @@ router.get('/getWorkList', function (req, res, next) {
 
 //获取收藏列表
 router.get('/getFavouriteList', function (req, res, next) {
-    let userId = req.cookies.userId;
+    // let userId = req.cookies.userId;
+    let userId = req.param('userId');
     FavouriteList.findFavouriteBlogs(userId, function (err, doc) {
         if (err) {
             res.json({
@@ -465,7 +466,8 @@ router.get('/getFavouriteList', function (req, res, next) {
 
 //获取点赞列表
 router.get('/getLikeList', function (req, res, next) {
-    let userId = req.cookies.userId;
+    // let userId = req.cookies.userId;
+    let userId = req.param('userId');
     LikeList.findLikeBlogs(userId, function (err, doc) {
         if (err) {
             res.json({
