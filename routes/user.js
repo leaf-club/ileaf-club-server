@@ -450,6 +450,9 @@ router.get('/getFavouriteList', function (req, res, next) {
                                 }
                             })
                         }else{
+                            console.log(doc);
+                            console.log(doc1);
+                            console.log(doc2);
                             var favouriteBlogList = [];
                             var favouriteWorkList = [];
                             doc.forEach(item => {
@@ -457,7 +460,7 @@ router.get('/getFavouriteList', function (req, res, next) {
                                     item.blogId.favorited = true;
                                 }
                                 doc2.forEach(item1=>{
-                                    if(item.blogId._id==item1.blogId._id){
+                                    if(item1.blogId && item.blogId && item.blogId._id==item1.blogId._id){
                                         item.blogId.liked = true;
                                     }
                                 })
@@ -468,7 +471,7 @@ router.get('/getFavouriteList', function (req, res, next) {
                                     item.workId.favorited = true;
                                 }
                                 doc2.forEach(item1=>{
-                                    if(item.workId._id==item1.workId._id){
+                                    if(item1.workId && item.workId && item.workId._id==item1.workId._id){
                                         item.workId.liked = true;
                                     }
                                 })
@@ -529,7 +532,6 @@ router.get('/getLikeList', function (req, res, next) {
                                 }
                             })
                         }else{
-                            conosole.log(123);
                             var likeBlogList = [];
                             var likeWorkList = [];
                             doc.forEach(item => {
@@ -537,18 +539,18 @@ router.get('/getLikeList', function (req, res, next) {
                                     item.blogId.liked = true;
                                 }
                                 doc2.forEach(item1=>{
-                                    if(item.blogId._id==item1.blogId._id){
+                                    if(item1.blogId && item.blogId && item.blogId._id==item1.blogId._id){
                                         item.blogId.favorited = true;
                                     }
                                 })
-                                likeBlogList.push(item.blogId);
+                                likeBlogList.push(item.blogId);                           
                             });
                             doc1.forEach(item => {
                                 if (item.userId == userId) {
                                     item.workId.liked = true;
                                 }
                                 doc2.forEach(item1=>{
-                                    if(item.workId._id==item1.workId._id){
+                                    if(item1.workId && item.workId && item.workId._id==item1.workId._id){
                                         item.workId.favorited = true;
                                     }
                                 })
