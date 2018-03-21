@@ -27,12 +27,10 @@ mongoose.connection.on("disconnected", function () {
     console.log("MongoDB disconnected.")
 });
 
-//获取验证码
+//获取验证码,并验证邮箱是否存在
 router.post('/getValidationCode',function(req,res,next){
     var email = req.body.email;
-    var number = getRandomNumber();
-    sendEmail(email,number);
-    redisClient.set(email,number,function(err,reply){
+    User.findOne({contact:email},function(err,doc){
         if(err){
             res.json({
                 result:{
@@ -41,15 +39,37 @@ router.post('/getValidationCode',function(req,res,next){
                 }
             })
         }else{
-            redisClient.expire("ValidationCode",24*60*60);
-            res.json({
-                result: {
-                    status: '200',
-                    message: '验证码已发送'
-                }
-            })
+            if(doc){
+                res.json({
+                    result:{
+                        status:'302',
+                        message:'该邮箱已注册'
+                    }
+                })
+            }else{
+                var number = getRandomNumber();
+                sendEmail(email,number);
+                redisClient.set(email,number,function(err,reply){
+                    if(err){
+                        res.json({
+                            result:{
+                                status:'302',
+                                message:err.message
+                            }
+                        })
+                    }else{
+                        redisClient.expire("ValidationCode",24*60*60);
+                        res.json({
+                            result: {
+                                status: '200',
+                                message: '验证码已发送'
+                            }
+                        })
+                    }
+                });
+            }
         }
-    });  
+    })    
 })
 
 //手动添加一个用户
@@ -75,43 +95,63 @@ router.post('/register', function (req, res, next) {
     // req.session.contact = num;
     // console.log(req.session);
     // sendEmail(contact,num);
-    redisClient.get(contact,function(err,value){
-        var redisValidateNumber = value;
-        if(validateNumber==redisValidateNumber){
-            newUser.save(function (err, doc) {
-                if (err) {
-                    res.json({
-                        result: {
-                            status: '304',
-                            message: err.message
-                        }
-                    })
-                } else {         
-                    res.json({
-                        result: {
-                            status: '200',
-                            message: 'success'
-                        },
-                        data: {
-                            userInfo: {
-                                userId: doc._id,
-                                userName: doc.userName,
-                                avatar: doc.avatar,
-                                contact: doc.contact
-                            }
-                        }
-                    })
-                }
-            });
-        }else{
+    User.findOne({userName:userName},function(err,userdoc){
+        if(err){
             res.json({
                 result:{
                     status:'302',
-                    message:'验证码不正确'
+                    message:err.message
                 }
             })
-        }  
-    });   
+        }else{
+            if(userdoc){
+                res.json({
+                    result:{
+                        status:'302',
+                        message:'该用户名已注册'
+                    }
+                })
+            }else{
+                redisClient.get(contact,function(err,value){
+                    var redisValidateNumber = value;
+                    if(validateNumber==redisValidateNumber){
+                        newUser.save(function (err, doc) {
+                            if (err) {
+                                res.json({
+                                    result: {
+                                        status: '304',
+                                        message: err.message
+                                    }
+                                })
+                            } else {         
+                                res.json({
+                                    result: {
+                                        status: '200',
+                                        message: 'success'
+                                    },
+                                    data: {
+                                        userInfo: {
+                                            userId: doc._id,
+                                            userName: doc.userName,
+                                            avatar: doc.avatar,
+                                            contact: doc.contact
+                                        }
+                                    }
+                                })
+                            }
+                        });
+                    }else{
+                        res.json({
+                            result:{
+                                status:'302',
+                                message:'验证码不正确'
+                            }
+                        })
+                    }  
+                });
+            }
+        }
+    })    
 });
 
 
@@ -529,7 +569,7 @@ router.get('/getLikeList', function (req, res, next) {
                                 }
                             })
                         }else{
-                            conosole.log(123);
+                            console.log(123);
                             var likeBlogList = [];
                             var likeWorkList = [];
                             doc.forEach(item => {
@@ -547,7 +587,7 @@ router.get('/getLikeList', function (req, res, next) {
                                 if (item.userId == userId) {
                                     item.workId.liked = true;
                                 }
-                                doc2.forEach(item1=>{
+                                doc2.forEach(item1=>{                                   
                                     if(item.workId._id==item1.workId._id){
                                         item.workId.favorited = true;
                                     }
