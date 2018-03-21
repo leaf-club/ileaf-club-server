@@ -226,7 +226,7 @@ router.get('/checkLogin', function (req, res, next) {
 
 //获取用户信息
 router.get('/getUserInfo', function (req, res, next) {
-    var userId = req.param('userId');
+    var userId = req.query.userId;
     User.findOne({ _id: userId }, function (err, userDoc) {
         if (err) {
             res.json({
@@ -260,7 +260,7 @@ router.get('/getUserInfo', function (req, res, next) {
 
 //获取文章数，作品数，收藏数，点赞数，草稿数
 router.get('/getCounts', function (req, res, next) {
-    var userId = req.param("userId");
+    var userId = req.query.userId;
     Blog.find({ userInfo: userId, status: 1 }).then(function (blogDoc) {
         Work.find({ userInfo: userId }).then(function (workDoc) {
             FavouriteList.find({ userId: userId }).then(function (FavouriteList) {
@@ -289,9 +289,9 @@ router.get('/getCounts', function (req, res, next) {
 //获取个人博客列表(需要传userId)
 router.get('/getBlogList', function (req, res, next) {
     // let userId = req.cookies.userId;
-    let userId = req.param('userId');
-    let pageIndex = +req.param('pageIndex');
-    let pageSize = +req.param('pageSize');
+    let userId = req.query.userId;
+    let pageIndex = +req.query.pageIndex;
+    let pageSize = +req.query.pageSize;
     let skip = (pageIndex - 1) * pageSize;   //分页参数
 
     //筛选的时候要选出blogStatus为1的已发布的博文
@@ -353,9 +353,13 @@ router.get('/getBlogList', function (req, res, next) {
 //获取个人作品列表
 router.get('/getWorkList', function (req, res, next) {
     // let userId = req.cookies.userId;
-    let userId = req.param('userId');
-    let pageIndex = +req.param('pageIndex');
-    let pageSize = +req.param('pageSize');
+    // express不建议这样写
+    // let userId = req.param('userId');
+    // let pageIndex = +req.param('pageIndex');
+    // let pageSize = +req.param('pageSize');
+    let userId = req.query.userId;
+    let pageIndex = +req.query.pageIndex;
+    let pageSize = +req.query.pageSize;
     let skip = (pageIndex - 1) * pageSize;   //分页参数
 
     let workModel = Work.find({ userInfo: userId }).skip(skip).limit(pageSize);
@@ -416,7 +420,9 @@ router.get('/getWorkList', function (req, res, next) {
 //获取收藏列表
 router.get('/getFavouriteList', function (req, res, next) {
     // let userId = req.cookies.userId;
-    let userId = req.param('userId');
+    // express 不建议这样写
+    // let userId = req.param('userId');
+    let userId = req.query.userId;
     FavouriteList.findFavouriteBlogs(userId, function (err, doc) {
         if (err) {
             res.json({
@@ -494,7 +500,8 @@ router.get('/getFavouriteList', function (req, res, next) {
 //获取点赞列表
 router.get('/getLikeList', function (req, res, next) {
     // let userId = req.cookies.userId;
-    let userId = req.param('userId');
+    // let userId = req.param('userId');
+    let userId = req.query.userId;
     LikeList.findLikeBlogs(userId, function (err, doc) {
         if (err) {
             res.json({
@@ -522,6 +529,7 @@ router.get('/getLikeList', function (req, res, next) {
                                 }
                             })
                         }else{
+                            conosole.log(123);
                             var likeBlogList = [];
                             var likeWorkList = [];
                             doc.forEach(item => {
@@ -567,8 +575,8 @@ router.get('/getLikeList', function (req, res, next) {
 //获取草稿列表
 router.get('/getDraft', function (req, res, next) {
     let userId = req.cookies.userId;
-    let pageIndex = +req.param('pageIndex');
-    let pageSize = +req.param('pageSize');
+    let pageIndex = +req.query.pageIndex;
+    let pageSize = +req.query.pageSize;
     let skip = (pageIndex - 1) * pageSize;   //分页参数
 
     //筛选的时候要选出blogStatus为1的已发布的博文
