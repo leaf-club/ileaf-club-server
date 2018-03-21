@@ -263,7 +263,7 @@ router.post('/like',function(req,res,next){
             }else{
                 if(workDoc){
                     workDoc.likeNum++;
-                    console.log(workDoc.likeNum++);
+                    // console.log(workDoc.likeNum++);
                     workDoc.save().then(function(workDoc){
                         var likeWork = new LikeList();
                         likeWork.userId = userId;
@@ -366,7 +366,10 @@ router.post('/like',function(req,res,next){
                                 res.json({
                                     result:{
                                         status:'200',
-                                        message: '取消收藏成功'
+                                        message: '取消点赞成功'
+                                    },
+                                    data: {
+                                        likeNum: workDoc.likeNum
                                     }
                                 })
                             }
