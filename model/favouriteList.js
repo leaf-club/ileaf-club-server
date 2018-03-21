@@ -17,7 +17,7 @@ var favouriteListSchema = new Schema({
 favouriteListSchema.statics = {
     findFavouriteBlogs: function(userId,callback){
         return this
-            .find({userId:userId})
+            .find({userId:userId,type:0})
             .sort({createTime:-1})
             .populate({path:"blogId",populate:{path:"userInfo",select:'userName avatar contact _id'}})
             .exec(callback)
