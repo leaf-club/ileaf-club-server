@@ -7,7 +7,7 @@ var BlogCommentList = require('./../model/blogCommentList');
 var BlogCommentReplyList = require('./../model/blogCommentReplyList');
 var FavouriteList = require('./../model/favouriteList');
 var LikeList = require('./../model/likeList');
-var LikeComment = require('./../model/likeCommon');
+var LikeComment = require('./../model/likeComment');
 var larger = require('./../util/util');
 var selectTypeName = require('./../util/enumerator');
 
