@@ -12,6 +12,7 @@ var blogCommentListSchema = new Schema({
     "createTime":Number,
     "likeNum":{type:Number,default:0},
     "content":String,
+    "liked":false,
     "status":Number,//如果是1，则是评论，如果是2，则是评论的回复
     "replyList":[{
         type: Number,
@@ -21,7 +22,7 @@ var blogCommentListSchema = new Schema({
 });
 
 blogCommentListSchema.statics = {
-    findUserByCommentId: function(blogId,callback){
+    findCommentByBlogId: function(blogId,callback){
         return this
             .find({blogId:blogId})
             .populate({path:'userInfo',select:'userName avatar contact _id'})
