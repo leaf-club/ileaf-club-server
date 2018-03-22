@@ -429,7 +429,7 @@ router.post('/addBlogComment', function (req, res, next) {
 //获取评论以及评论的回复
 router.get('/getCommentList', function (req, res, next) {
     var userId = req.cookies.userId;
-    var blogId = req.param('blogId');
+    var blogId = req.query.blogId;
     //var commentAndReplyList = [];
     BlogCommentList.findCommentByBlogId(blogId, function (err, doc) {
         if (err) {
@@ -460,9 +460,13 @@ router.get('/getCommentList', function (req, res, next) {
                             })
                         }else{
                             doc.forEach(item=>{
-                                if(likeCommentDoc && item._id == likeCommentDoc.commentId){
-                                    item.liked = true;
-                                 }
+                                if(likeCommentDoc) {
+                                    likeCommentDoc.forEach(item1 => {
+                                        if (item._id == item1.commentId) {
+                                            item.liked = true;
+                                        }
+                                    })
+                                }
                             })
                             res.json({
                                 result: {
@@ -495,7 +499,7 @@ router.get('/getCommentList', function (req, res, next) {
 router.post('/likeCommet', function (req, res, next) {
     var commentId = req.body.commentId;
     var userId = req.body.userId;
-    var operate = operate;
+    var operate = req.body.operate;
     if(operate){
         BlogCommentList.findOne({ _id: commentId }, function (err, doc) {
             if (err) {
