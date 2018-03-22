@@ -12,7 +12,7 @@ var blogCommentListSchema = new Schema({
     "createTime":Number,
     "likeNum":{type:Number,default:0},
     "content":String,
-    "liked":false,
+    "liked":{type:Boolean,default:false},
     "status":Number,//如果是1，则是评论，如果是2，则是评论的回复
     "replyList":[{
         type: Number,
