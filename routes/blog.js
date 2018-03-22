@@ -285,7 +285,7 @@ router.get('/getBlogDetail', function (req, res, next) {
                                                         }
                                                     });
                                                     doc3.forEach(item => {    
-                                                            if (item._id == doc1._id) {
+                                                            if (item.blogId == doc1._id) {
                                                                 doc1.liked = true;
                                                             }                                                      
                                                     });
