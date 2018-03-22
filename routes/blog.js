@@ -7,6 +7,7 @@ var BlogCommentList = require('./../model/blogCommentList');
 var BlogCommentReplyList = require('./../model/blogCommentReplyList');
 var FavouriteList = require('./../model/favouriteList');
 var LikeList = require('./../model/likeList');
+var LikeComment = require('./../model/likeCommon');
 var larger = require('./../util/util');
 var selectTypeName = require('./../util/enumerator');
 
@@ -427,9 +428,10 @@ router.post('/addBlogComment', function (req, res, next) {
 
 //获取评论以及评论的回复
 router.get('/getCommentList', function (req, res, next) {
+    var userId = req.cookies.userId;
     var blogId = req.param('blogId');
     //var commentAndReplyList = [];
-    BlogCommentList.findUserByCommentId(blogId, function (err, doc) {
+    BlogCommentList.findCommentByBlogId(blogId, function (err, doc) {
         if (err) {
             res.json({
                 result: {
@@ -447,15 +449,43 @@ router.get('/getCommentList', function (req, res, next) {
                 if (doc.replyList != null) {
                     doc.replyList.sort(larger("createTime"));
                 }
-                res.json({
-                    result: {
-                        status: '200',
-                        message: 'success'
-                    },
-                    data: {
-                        commentList: doc
-                    }
-                })
+                if(userId){
+                    LikeComment.find({userId:userId},function(err,likeCommentDoc){
+                        if(err){
+                            res.json({
+                                result: {
+                                    status: '302',
+                                    message: err.message
+                                }
+                            })
+                        }else{
+                            doc.forEach(item=>{
+                                if(likeCommentDoc && item._id == likeCommentDoc.commentId){
+                                    item.liked = true;
+                                 }
+                            })
+                            res.json({
+                                result: {
+                                    status: '200',
+                                    message: 'success'
+                                },
+                                data: {
+                                    commentList: doc
+                                }
+                            })
+                        }
+                    })
+                }else{
+                    res.json({
+                        result: {
+                            status: '200',
+                            message: 'success'
+                        },
+                        data: {
+                            commentList: doc
+                        }
+                    })
+                }
             }
         }
     })
@@ -464,38 +494,104 @@ router.get('/getCommentList', function (req, res, next) {
 //给评论点赞
 router.post('/likeCommet', function (req, res, next) {
     var commentId = req.body.commentId;
-    BlogCommentList.findOne({ _id: commentId }, function (err, doc) {
-        if (err) {
-            res.json({
-                result: {
-                    status: '302',
-                    message: err.message
-                }
-            })
-        } else {
-            doc.likeNum++;
-            doc.save(function (err, newDoc) {
-                if (err) {
-                    res.json({
-                        result: {
-                            status: '302',
-                            message: err.message
-                        }
-                    })
-                } else {
-                    res.json({
-                        result: {
-                            status: '200',
-                            message: 'success'
-                        },
-                        data: {
-                            likeNum: newDoc.likeNum
-                        }
-                    })
-                }
-            })
-        }
-    })
+    var userId = req.body.userId;
+    var operate = operate;
+    if(operate){
+        BlogCommentList.findOne({ _id: commentId }, function (err, doc) {
+            if (err) {
+                res.json({
+                    result: {
+                        status: '302',
+                        message: err.message
+                    }
+                })
+            } else {
+                doc.likeNum++;
+                doc.save(function (err, newDoc) {
+                    if (err) {
+                        res.json({
+                            result: {
+                                status: '302',
+                                message: err.message
+                            }
+                        })
+                    } else {
+                        var likeComment = new LikeComment({
+                            userId:userId,
+                            commentId:commentId,
+                            createTime: Date.now()
+                        });
+                        likeComment.save(function(err,docs){
+                            if(err){
+                                res.json({
+                                    result: {
+                                        status: '302',
+                                        message: err.message
+                                    }
+                                })
+                            }else{
+                                res.json({
+                                    result: {
+                                        status: '200',
+                                        message: 'success'
+                                    },
+                                    data: {
+                                        likeNum: newDoc.likeNum
+                                    }
+                                })
+                            }
+                        })  
+                    }
+                })
+            }
+        })
+    }else{
+        BlogCommentList.findOne({ _id: commentId }, function (err, doc) {
+            if (err) {
+                res.json({
+                    result: {
+                        status: '302',
+                        message: err.message
+                    }
+                })
+            } else {
+                if(doc.likeNum>0){
+                    doc.likeNum--;
+                }      
+                doc.save(function (err, newDoc) {
+                    if (err) {
+                        res.json({
+                            result: {
+                                status: '302',
+                                message: err.message
+                            }
+                        })
+                    } else {
+                        LikeComment.remove({commentId:commentId,userId:userId},function(err,docs){
+                            if(err){
+                                res.json({
+                                    result: {
+                                        status: '302',
+                                        message: err.message
+                                    }
+                                })
+                            }else{
+                                res.json({
+                                    result: {
+                                        status: '200',
+                                        message: 'success'
+                                    },
+                                    data: {
+                                        likeNum: newDoc.likeNum
+                                    }
+                                })
+                            }
+                        })  
+                    }
+                })
+            }
+        })
+    }  
 })
 
 module.exports = router;
